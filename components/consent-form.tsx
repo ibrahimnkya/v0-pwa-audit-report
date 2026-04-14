@@ -34,7 +34,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
     setError(null)
 
     const result = await onEmailSubmit(email)
-    
+
     if (!result.success) {
       setError(result.error || "An error occurred. Please try again.")
     }
@@ -80,8 +80,8 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
             <Alert className="mb-6 border-amber-500/50 bg-amber-50">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800">
-                <strong>CONFIDENTIAL:</strong> This document contains sensitive security information 
-                about Tanzania Agricultural Development Bank&apos;s IT infrastructure. Unauthorized 
+                <strong>CONFIDENTIAL:</strong> This document contains sensitive security information
+                about JamboRide&apos;s IT infrastructure. Unauthorized
                 access, distribution, or disclosure is strictly prohibited.
               </AlertDescription>
             </Alert>
@@ -116,9 +116,9 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                     className="mt-1"
                   />
                   <label htmlFor="terms" className="text-sm text-foreground leading-relaxed cursor-pointer">
-                    <span className="font-medium">Terms of Access:</span> I confirm that I am an 
-                    authorized representative of Tanzania Agricultural Development Bank (TADB) or 
-                    have been explicitly granted access to this document by TADB or Optin Technology Limited.
+                    <span className="font-medium">Terms of Access:</span> I confirm that I am an
+                    authorized representative of JamboRide or
+                    have been explicitly granted access to this document by JamboRide or Optin Technology Limited.
                   </label>
                 </div>
 
@@ -130,11 +130,11 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                     className="mt-1"
                   />
                   <label htmlFor="nda" className="text-sm text-foreground leading-relaxed cursor-pointer">
-                    <span className="font-medium">Non-Disclosure Agreement:</span> I agree not to share, 
-                    copy, distribute, or disclose any information contained in this audit report to 
-                    unauthorized parties. I understand that violation of this agreement may result in 
+                    <span className="font-medium">Non-Disclosure Agreement:</span> I agree not to share,
+                    copy, distribute, or disclose any information contained in this audit report to
+                    unauthorized parties. I understand that violation of this agreement may result in
                     legal action.
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setShowNDAModal(true)}
                       className="text-primary hover:underline ml-1"
@@ -152,8 +152,8 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                     className="mt-1"
                   />
                   <label htmlFor="data" className="text-sm text-foreground leading-relaxed cursor-pointer">
-                    <span className="font-medium">Data Processing:</span> I consent to Optin Technology 
-                    Limited recording my email address, access time, and IP address for audit trail 
+                    <span className="font-medium">Data Processing:</span> I consent to Optin Technology
+                    Limited recording my email address, access time, and IP address for audit trail
                     purposes in accordance with data protection regulations.
                   </label>
                 </div>
@@ -210,34 +210,34 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               <CardContent className="prose prose-sm">
                 <h4>1. Confidential Information</h4>
                 <p>
-                  The IT Infrastructure Audit Report and all information contained therein, 
-                  including but not limited to security vulnerabilities, network configurations, 
-                  system architectures, and recommendations, shall be treated as strictly 
+                  The IT Infrastructure Audit Report and all information contained therein,
+                  including but not limited to security vulnerabilities, network configurations,
+                  system architectures, and recommendations, shall be treated as strictly
                   confidential information.
                 </p>
-                
+
                 <h4>2. Obligations</h4>
                 <p>
-                  The receiving party agrees to: (a) maintain the confidentiality of the 
-                  information; (b) not disclose the information to any third party without 
-                  prior written consent; (c) use the information solely for the purpose of 
+                  The receiving party agrees to: (a) maintain the confidentiality of the
+                  information; (b) not disclose the information to any third party without
+                  prior written consent; (c) use the information solely for the purpose of
                   reviewing and implementing security improvements.
                 </p>
-                
+
                 <h4>3. Duration</h4>
                 <p>
-                  This agreement shall remain in effect for a period of five (5) years from 
+                  This agreement shall remain in effect for a period of five (5) years from
                   the date of access to the confidential information.
                 </p>
-                
+
                 <h4>4. Legal Consequences</h4>
                 <p>
-                  Breach of this agreement may result in legal action, including but not 
+                  Breach of this agreement may result in legal action, including but not
                   limited to injunctive relief and damages.
                 </p>
 
-                <Button 
-                  onClick={() => setShowNDAModal(false)} 
+                <Button
+                  onClick={() => setShowNDAModal(false)}
                   className="w-full mt-4"
                 >
                   I Understand
