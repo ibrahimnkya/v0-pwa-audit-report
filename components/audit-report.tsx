@@ -817,3 +817,5 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
     </div>
   )
 }
+
+export default AuditReport
