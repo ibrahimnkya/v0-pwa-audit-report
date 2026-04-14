@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     })
 
     if (error) {
-      console.error("[v0] Supabase verify OTP error:", error)
+      console.error("Supabase verify OTP error:", error)
       return NextResponse.json(
         { success: false, error: "Invalid or expired verification code. Please try again." },
         { status: 400 }
@@ -32,9 +32,9 @@ export async function POST(request: Request) {
 
     // Log access to report_access table
     const headersList = await headers()
-    const ip = headersList.get("x-forwarded-for") || 
-               headersList.get("x-real-ip") || 
-               "unknown"
+    const ip = headersList.get("x-forwarded-for") ||
+      headersList.get("x-real-ip") ||
+      "unknown"
     const userAgent = headersList.get("user-agent") || "unknown"
 
     const { error: insertError } = await supabase
@@ -51,12 +51,12 @@ export async function POST(request: Request) {
       console.error("[v0] Failed to log access:", insertError)
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      user: data.user 
+      user: data.user
     })
   } catch (error) {
-    console.error("[v0] Verify OTP error:", error)
+    console.error("Verify OTP error:", error)
     return NextResponse.json(
       { success: false, error: "An unexpected error occurred" },
       { status: 500 }
