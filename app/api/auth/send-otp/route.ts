@@ -13,6 +13,13 @@ export async function POST(request: Request) {
       )
     }
 
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      return NextResponse.json(
+        { success: false, error: "Authentication service is not configured. Please contact support." },
+        { status: 500 }
+      )
+    }
+
     const supabase = await createClient()
 
     // Send OTP via Supabase Auth

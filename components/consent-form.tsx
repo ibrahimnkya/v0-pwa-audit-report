@@ -120,6 +120,9 @@ export function ConsentForm({ onEmailSubmit, onOtpVerify }: ConsentFormProps) {
                   Access is logged and monitored for compliance with Optin Technology security policies.
                 </p>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Verification codes are sent by email and validated before report access is granted.
+              </p>
             </div>
 
             <div className="flex items-center gap-3">
