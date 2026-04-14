@@ -85,7 +85,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800">
                 <strong>CONFIDENTIAL:</strong> This document contains sensitive security information 
-                about Tanzania Agricultural Development Bank&apos;s IT infrastructure. Unauthorized 
+                about JamboRide&apos;s IT infrastructure. Unauthorized 
                 access, distribution, or disclosure is strictly prohibited.
               </AlertDescription>
             </Alert>
@@ -125,8 +125,8 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   />
                   <label htmlFor="terms" className="text-sm text-foreground leading-relaxed cursor-pointer">
                     <span className="font-medium">Terms of Access:</span> I confirm that I am an 
-                    authorized representative of Tanzania Agricultural Development Bank (TADB) or 
-                    have been explicitly granted access to this document by TADB or Optin Technology Limited.
+                    authorized representative of JamboRide or 
+                    have been explicitly granted access to this document by JamboRide or Optin Technology Limited.
                   </label>
                 </div>
 
