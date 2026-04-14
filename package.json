@@ -1,7 +1,8 @@
 {
-  "name": "jambo-audit",
+  "name": "jambo-ride-audit",
   "version": "1.0.0",
   "private": true,
+  "author": "Ibrahim Nkya @ OptinSolutions LTD",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
