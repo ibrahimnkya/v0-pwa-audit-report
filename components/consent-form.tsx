@@ -70,14 +70,18 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               <div className="p-2 bg-primary rounded-xl shadow-sm">
                 <Shield className="h-5 w-5 text-primary-foreground" />
               </div>
-              <div>
-                <CardTitle className="text-foreground">Access Authorization Required</CardTitle>
-                <CardDescription>
-                  Please review and accept the terms below to access this confidential report
-                </CardDescription>
-              </div>
             </div>
-          </CardHeader>
+
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                OTP-protected session
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Verification codes are sent by email and validated before report access is granted.
+              </p>
+            </div>
+          </div>
 
           <CardContent className="pt-6">
             {/* Warning Banner */}
@@ -90,8 +94,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               </AlertDescription>
             </Alert>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Input */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground flex items-center gap-2">
                   <Mail className="h-4 w-4 text-primary" />
@@ -105,9 +108,6 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   className="h-12 border-border/80 bg-background/90 focus-visible:ring-2 focus-visible:ring-primary/40"
                   required
                 />
-                <p className="text-xs text-muted-foreground">
-                  A verification code will be sent to this email address
-                </p>
               </div>
 
               {/* Consent Checkboxes */}
@@ -121,7 +121,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                     id="terms"
                     checked={agreedToTerms}
                     onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
-                    className="mt-1"
+                    className="mt-0.5"
                   />
                   <label htmlFor="terms" className="text-sm text-foreground leading-relaxed cursor-pointer">
                     <span className="font-medium">Terms of Access:</span> I confirm that I am an 
@@ -130,41 +130,38 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   </label>
                 </div>
 
-                <div className="flex items-start gap-3">
+                <label className="flex items-start gap-3 rounded-xl border border-primary/30 px-4 py-3 hover:border-primary transition-colors cursor-pointer">
                   <Checkbox
                     id="nda"
                     checked={agreedToNDA}
                     onCheckedChange={(checked) => setAgreedToNDA(checked === true)}
-                    className="mt-1"
+                    className="mt-0.5"
                   />
-                  <label htmlFor="nda" className="text-sm text-foreground leading-relaxed cursor-pointer">
-                    <span className="font-medium">Non-Disclosure Agreement:</span> I agree not to share, 
-                    copy, distribute, or disclose any information contained in this audit report to 
-                    unauthorized parties. I understand that violation of this agreement may result in 
-                    legal action.
-                    <button 
+                  <span className="text-sm leading-relaxed">
+                    <span className="font-medium">Non-Disclosure Agreement:</span> I will not share, copy, or
+                    disclose any report content to unauthorized parties.
+                    <button
                       type="button"
                       onClick={() => setShowNDAModal(true)}
-                      className="text-primary hover:underline ml-1"
+                      className="ml-1 text-primary hover:underline"
                     >
                       View full NDA terms
                     </button>
-                  </label>
-                </div>
+                  </span>
+                </label>
 
-                <div className="flex items-start gap-3">
+                <label className="flex items-start gap-3 rounded-xl border border-primary/30 px-4 py-3 hover:border-primary transition-colors cursor-pointer">
                   <Checkbox
                     id="data"
                     checked={agreedToDataPolicy}
                     onCheckedChange={(checked) => setAgreedToDataPolicy(checked === true)}
-                    className="mt-1"
+                    className="mt-0.5"
                   />
-                  <label htmlFor="data" className="text-sm text-foreground leading-relaxed cursor-pointer">
-                    <span className="font-medium">Data Processing:</span> I consent to Optin Technology 
-                    Limited recording my email address, access time, and IP address for audit trail 
-                    purposes in accordance with data protection regulations.
-                  </label>
-                </div>
+                  <span className="text-sm leading-relaxed">
+                    <span className="font-medium">Data Processing:</span> I consent to logging my email, access
+                    time, and IP address for audit and compliance purposes.
+                  </span>
+                </label>
               </div>
 
               {error && (
@@ -192,21 +189,12 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               </Button>
             </form>
 
-            {/* Footer */}
-            <div className="mt-6 pt-6 border-t border-border">
-              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                <FileText className="h-3 w-3" />
-                <span>Document prepared by Optin Technology Limited</span>
-              </div>
-              <p className="text-center text-xs text-muted-foreground mt-2">
-                For technical support, contact{" "}
-                <a href="mailto:info@optin.co.tz" className="text-primary hover:underline">
-                  info@optin.co.tz
-                </a>
-              </p>
+            <div className="mt-6 border-t border-border pt-4 flex items-center gap-2 text-xs text-muted-foreground">
+              <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+              <span>Prepared by Optin Technology Limited • Support: info@optin.co.tz</span>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* NDA Modal */}
         {showNDAModal && (
@@ -254,7 +242,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
             </Card>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   )
 }
