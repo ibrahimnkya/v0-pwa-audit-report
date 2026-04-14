@@ -47,9 +47,6 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
         <div className="grid lg:grid-cols-[1fr_1.1fr]">
           <div className="bg-primary/10 p-8 lg:p-12 flex flex-col justify-between gap-8">
             <div className="space-y-8">
-              <a href="#" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
-                ← Homepage
-              </a>
               <div className="space-y-4">
                 <p className="text-primary/70 font-semibold">step 1/2</p>
                 <h1 className="text-4xl font-bold tracking-tight text-primary leading-tight">
