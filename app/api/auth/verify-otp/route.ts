@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
-    // Verify OTP
+    // Verify OTP - token is the 6-digit code
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token: otp,
@@ -23,14 +23,14 @@ export async function POST(request: Request) {
     })
 
     if (error) {
-      console.error("[v0] Supabase verify OTP error:", error)
+      console.error("Supabase verify OTP error:", error)
       return NextResponse.json(
         { success: false, error: "Invalid or expired verification code. Please try again." },
         { status: 400 }
       )
     }
 
-    // Log access to report_access table
+    // Log access to report_access table for compliance
     const headersList = await headers()
     const ip = headersList.get("x-forwarded-for") || 
                headersList.get("x-real-ip") || 
@@ -43,12 +43,12 @@ export async function POST(request: Request) {
         email,
         ip_address: ip.split(",")[0].trim(),
         user_agent: userAgent.substring(0, 500),
-        consent_given: true
+        consent_given: true,
+        accessed_at: new Date().toISOString()
       })
 
     if (insertError) {
-      // Log error but don't fail the request
-      console.error("[v0] Failed to log access:", insertError)
+      console.error("Failed to log access record:", insertError)
     }
 
     return NextResponse.json({ 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
       user: data.user 
     })
   } catch (error) {
-    console.error("[v0] Verify OTP error:", error)
+    console.error("Verify OTP error:", error)
     return NextResponse.json(
       { success: false, error: "An unexpected error occurred" },
       { status: 500 }
