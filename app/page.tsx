@@ -94,11 +94,6 @@ export default function Home() {
     setState("consent")
   }
 
-  const handleBack = () => {
-    setEmail("")
-    setState("consent")
-  }
-
   // Show loading state while checking auth
   if (isLoading) {
     return (
@@ -118,7 +113,6 @@ export default function Home() {
           email={email}
           onVerify={handleVerify}
           onResend={handleResend}
-          onBack={handleBack}
         />
       )
     case "report":

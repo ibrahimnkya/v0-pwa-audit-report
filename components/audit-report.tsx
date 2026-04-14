@@ -185,7 +185,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             IT Infrastructure Security Audit Report
           </h1>
           <p className="text-xl text-muted-foreground">
-            Tanzania Agricultural Development Bank (TADB)
+            JamboRide
           </p>
         </div>
 
@@ -198,7 +198,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
                   <Building2 className="h-5 w-5 text-primary" />
                   <div>
                     <p className="text-sm text-muted-foreground">Prepared For</p>
-                    <p className="font-medium text-foreground">Tanzania Agricultural Development Bank</p>
+                    <p className="font-medium text-foreground">JamboRide</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -272,7 +272,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           <div className="prose prose-sm max-w-none text-foreground">
             <p className="text-muted-foreground leading-relaxed">
               This report presents the findings from a comprehensive IT infrastructure security 
-              audit conducted for Tanzania Agricultural Development Bank (TADB). The assessment 
+              audit conducted for JamboRide. The assessment 
               was performed by Optin Technology Limited and covers network infrastructure, 
               server systems, security controls, and operational procedures.
             </p>
@@ -688,7 +688,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           <CardContent>
             <p className="text-muted-foreground mb-4">
               The following items are recommended for Phase 2 implementation to further 
-              strengthen TADB&apos;s security posture:
+              strengthen JamboRide&apos;s security posture:
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
