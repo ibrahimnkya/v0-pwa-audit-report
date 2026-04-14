@@ -1,7 +1,7 @@
 {
-  "name": "TADB IT Infrastructure Audit Report",
-  "short_name": "TADB Audit",
-  "description": "Confidential IT Infrastructure Security Audit Report for Tanzania Agricultural Development Bank",
+  "name": "JamboRide IT Infrastructure Audit Report",
+  "short_name": "JamboRide Audit",
+  "description": "Confidential IT Infrastructure Security Audit Report for JamboRide",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
