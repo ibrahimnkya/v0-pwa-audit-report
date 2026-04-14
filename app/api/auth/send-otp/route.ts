@@ -14,11 +14,14 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
-    // Send OTP via Supabase Auth
+    // Send OTP via Supabase Auth (code instead of magic link)
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         shouldCreateUser: true,
+        // Setting emailRedirectTo to undefined ensures Supabase sends a 6-digit code
+        // instead of a magic link
+        emailRedirectTo: undefined,
         data: {
           consent_given: true,
           consent_date: new Date().toISOString(),
