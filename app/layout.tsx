@@ -15,10 +15,10 @@ const sourceSans = Source_Sans_3({
 
 export const metadata: Metadata = {
   title: 'IT Infrastructure Audit Report | Optin Technology Limited',
-  description: 'Confidential IT Infrastructure Security Audit Report for Tanzania Agricultural Development Bank (TADB) prepared by Optin Technology Limited',
+  description: 'Confidential IT Infrastructure Security Audit Report for JamboRide prepared by Optin Technology Limited',
   generator: 'Optin Technology Limited',
   manifest: '/manifest.json',
-  keywords: ['IT audit', 'security', 'infrastructure', 'TADB', 'Optin'],
+  keywords: ['IT audit', 'security', 'infrastructure', 'JamboRide', 'Optin'],
   authors: [{ name: 'Optin Technology Limited', url: 'https://optin.co.tz' }],
   icons: {
     icon: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'TADB IT Audit',
+    title: 'JamboRide IT Audit',
   },
 }
 

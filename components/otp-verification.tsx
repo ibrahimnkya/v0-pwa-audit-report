@@ -5,17 +5,16 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
-import { Mail, ArrowLeft, RefreshCw, CheckCircle2 } from "lucide-react"
+import { Mail, RefreshCw, CheckCircle2, Sparkles, Shield } from "lucide-react"
 import Image from "next/image"
 
 interface OTPVerificationProps {
   email: string
   onVerify: (otp: string) => Promise<{ success: boolean; error?: string }>
   onResend: () => Promise<{ success: boolean; error?: string }>
-  onBack: () => void
 }
 
-export function OTPVerification({ email, onVerify, onResend, onBack }: OTPVerificationProps) {
+export function OTPVerification({ email, onVerify, onResend }: OTPVerificationProps) {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [isLoading, setIsLoading] = useState(false)
   const [isResending, setIsResending] = useState(false)
@@ -101,112 +100,120 @@ export function OTPVerification({ email, onVerify, onResend, onBack }: OTPVerifi
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Image
-              src="/images/optin-logo.webp"
-              alt="Optin Technology Limited"
-              width={180}
-              height={60}
-              className="h-14 w-auto"
-              priority
-            />
-          </div>
-        </div>
-
-        <Card className="border-2 border-primary/20 shadow-xl">
-          <CardHeader className="text-center">
-            <div className="mx-auto mb-4 p-3 bg-primary/10 rounded-full w-fit">
-              <Mail className="h-8 w-8 text-primary" />
+    <div className="min-h-screen bg-[#d7eef6] dark:bg-background flex items-center justify-center p-4 sm:p-6">
+      <Card className="w-full max-w-6xl overflow-hidden rounded-[28px] border-4 border-white/70 bg-background shadow-2xl">
+        <div className="grid lg:grid-cols-[1fr_1.1fr]">
+          <div className="bg-primary/10 p-8 lg:p-12 flex flex-col justify-between gap-8">
+            <div className="space-y-4">
+              <p className="text-primary/70 font-semibold">step 2/2</p>
+              <h1 className="text-4xl font-bold tracking-tight text-primary leading-tight">
+                Verify your access code
+              </h1>
+              <p className="text-muted-foreground">
+                Enter the 6-digit OTP sent to your email to access the confidential report.
+              </p>
             </div>
-            <CardTitle className="text-foreground">Check Your Email</CardTitle>
-            <CardDescription className="text-base">
-              {"We've sent a 6-digit verification code to"}
-              <br />
-              <span className="font-semibold text-foreground">{email}</span>
-            </CardDescription>
-          </CardHeader>
 
-          <CardContent className="space-y-6">
-            {/* OTP Input */}
-            <div className="flex justify-center gap-2" onPaste={handlePaste}>
-              {otp.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => { inputRefs.current[index] = el }}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  className="w-12 h-14 text-center text-2xl font-bold border-2 rounded-lg 
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white/70 px-3 py-1 text-xs text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                Secure verification
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Codes expire quickly for your security. Request a new code if needed.
+              </p>
+            </div>
+          </div>
+
+          <div className="p-8 lg:p-12">
+            <CardHeader className="p-0 mb-6">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <Image
+                  src="/images/optin-logo.webp"
+                  alt="Optin Technology Limited"
+                  width={160}
+                  height={52}
+                  className="h-12 w-auto"
+                  priority
+                />
+                <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Shield className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-foreground">Check Your Email</CardTitle>
+              <CardDescription className="text-base">
+                {"We've sent a 6-digit verification code to"}
+                <br />
+                <span className="font-semibold text-foreground">{email}</span>
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-6 p-0">
+              <div className="flex justify-center gap-2 sm:gap-3" onPaste={handlePaste}>
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => { inputRefs.current[index] = el }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="w-12 h-14 text-center text-2xl font-bold border-2 rounded-xl 
                            focus:border-primary focus:ring-2 focus:ring-primary/20 
                            outline-none transition-all bg-background text-foreground"
-                  disabled={isLoading}
-                />
-              ))}
-            </div>
+                    disabled={isLoading}
+                  />
+                ))}
+              </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button
-              onClick={() => handleSubmit()}
-              disabled={otp.some(d => !d) || isLoading}
-              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90"
-            >
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <Spinner className="h-4 w-4" />
-                  Verifying...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4" />
-                  Verify & Access Report
-                </span>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </Button>
 
-            {/* Resend Button */}
-            <div className="text-center">
-              <button
-                onClick={handleResend}
-                disabled={resendCooldown > 0 || isResending}
-                className="text-sm text-muted-foreground hover:text-primary disabled:cursor-not-allowed 
-                         inline-flex items-center gap-1 transition-colors"
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={otp.some(d => !d) || isLoading}
+                className="w-full h-12 text-base font-semibold rounded-xl"
               >
-                {isResending ? (
-                  <Spinner className="h-3 w-3" />
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Spinner className="h-4 w-4" />
+                    Verifying...
+                  </span>
                 ) : (
-                  <RefreshCw className="h-3 w-3" />
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Verify & Access Report
+                  </span>
                 )}
-                {resendCooldown > 0 
-                  ? `Resend code in ${resendCooldown}s`
-                  : "Resend verification code"
-                }
-              </button>
-            </div>
+              </Button>
 
-            {/* Back Button */}
-            <button
-              onClick={onBack}
-              className="w-full text-sm text-muted-foreground hover:text-foreground 
-                       flex items-center justify-center gap-1 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Use a different email address
-            </button>
-          </CardContent>
-        </Card>
-      </div>
+              <div className="text-center">
+                <button
+                  onClick={handleResend}
+                  disabled={resendCooldown > 0 || isResending}
+                  className="text-sm text-muted-foreground hover:text-primary disabled:cursor-not-allowed 
+                         inline-flex items-center gap-1 transition-colors"
+                >
+                  {isResending ? (
+                    <Spinner className="h-3 w-3" />
+                  ) : (
+                    <RefreshCw className="h-3 w-3" />
+                  )}
+                  {resendCooldown > 0
+                    ? `Resend code in ${resendCooldown}s`
+                    : "Resend verification code"
+                  }
+                </button>
+              </div>
+            </CardContent>
+          </div>
+        </div>
+      </Card>
     </div>
   )
 }
