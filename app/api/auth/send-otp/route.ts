@@ -4,8 +4,9 @@ import { NextResponse } from "next/server"
 export async function POST(request: Request) {
   try {
     const { email } = await request.json()
+    const normalizedEmail = String(email || "").trim().toLowerCase()
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
       return NextResponse.json(
         { success: false, error: "Please provide a valid email address" },
         { status: 400 }
@@ -16,12 +17,13 @@ export async function POST(request: Request) {
 
     // Send OTP via Supabase Auth
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: normalizedEmail,
       options: {
         shouldCreateUser: true,
         data: {
           consent_given: true,
           consent_date: new Date().toISOString(),
+          auth_method: "otp",
         }
       }
     })

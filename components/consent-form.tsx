@@ -7,7 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
-import { Shield, Lock, FileText, AlertTriangle, Mail } from "lucide-react"
+import { Shield, Lock, FileText, AlertTriangle, Mail, Sparkles, BadgeCheck } from "lucide-react"
 import Image from "next/image"
 
 interface ConsentFormProps {
@@ -42,11 +42,15 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-muted via-background to-muted flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.15),_transparent_40%),linear-gradient(135deg,hsl(var(--background)),hsl(var(--muted)))] flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-3xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
+        <div className="text-center mb-8 space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            Secure access workflow
+          </div>
+          <div className="flex justify-center">
             <Image
               src="/images/optin-logo.webp"
               alt="Optin Technology Limited"
@@ -56,14 +60,14 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               priority
             />
           </div>
-          <h1 className="text-2xl font-bold text-foreground">Confidential Document Access</h1>
-          <p className="text-muted-foreground mt-2">IT Infrastructure Audit Report</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Confidential Document Access</h1>
+          <p className="text-muted-foreground">IT Infrastructure Audit Report</p>
         </div>
 
-        <Card className="border-2 border-primary/20 shadow-xl">
-          <CardHeader className="bg-primary/5 border-b border-primary/10">
+        <Card className="overflow-hidden border border-border/60 bg-background/80 shadow-2xl backdrop-blur">
+          <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-border/60">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary rounded-lg">
+              <div className="p-2 bg-primary rounded-xl shadow-sm">
                 <Shield className="h-5 w-5 text-primary-foreground" />
               </div>
               <div>
@@ -77,7 +81,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
 
           <CardContent className="pt-6">
             {/* Warning Banner */}
-            <Alert className="mb-6 border-amber-500/50 bg-amber-50">
+            <Alert className="mb-6 border-amber-500/50 bg-amber-50/80 dark:bg-amber-500/10">
               <AlertTriangle className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800">
                 <strong>CONFIDENTIAL:</strong> This document contains sensitive security information 
@@ -98,7 +102,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   placeholder="your.email@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-12 border-2 focus:border-primary"
+                  className="h-12 border-border/80 bg-background/90 focus-visible:ring-2 focus-visible:ring-primary/40"
                   required
                 />
                 <p className="text-xs text-muted-foreground">
@@ -107,7 +111,11 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               </div>
 
               {/* Consent Checkboxes */}
-              <div className="space-y-4 bg-muted/50 p-4 rounded-lg">
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/30 p-5">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <BadgeCheck className="h-4 w-4 text-primary" />
+                  Consent checklist
+                </div>
                 <div className="flex items-start gap-3">
                   <Checkbox
                     id="terms"
@@ -168,7 +176,7 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               <Button
                 type="submit"
                 disabled={!allAgreed || !isValidEmail || isLoading}
-                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90"
+                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
