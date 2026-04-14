@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Spinner } from "@/components/ui/spinner"
 import { Shield, Lock, AlertTriangle, Mail, Sparkles, CheckCircle2 } from "lucide-react"
+import { Shield, Lock, FileText, AlertTriangle, Mail, Sparkles, BadgeCheck } from "lucide-react"
 import Image from "next/image"
 
 interface ConsentFormProps {
@@ -55,6 +56,33 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                 <p className="text-muted-foreground">
                   Confirm your identity and accept the confidentiality terms to continue.
                 </p>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.15),_transparent_40%),linear-gradient(135deg,hsl(var(--background)),hsl(var(--muted)))] flex items-center justify-center p-4 sm:p-6">
+      <div className="w-full max-w-3xl">
+        {/* Header */}
+        <div className="text-center mb-8 space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            Secure access workflow
+          </div>
+          <div className="flex justify-center">
+            <Image
+              src="/images/optin-logo.webp"
+              alt="Optin Technology Limited"
+              width={180}
+              height={60}
+              className="h-14 w-auto"
+              priority
+            />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Confidential Document Access</h1>
+          <p className="text-muted-foreground">IT Infrastructure Audit Report</p>
+        </div>
+
+        <Card className="overflow-hidden border border-border/60 bg-background/80 shadow-2xl backdrop-blur">
+          <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary rounded-xl shadow-sm">
+                <Shield className="h-5 w-5 text-primary-foreground" />
               </div>
             </div>
 
@@ -95,6 +123,14 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
               <AlertDescription className="text-amber-800">
                 <strong>CONFIDENTIAL:</strong> This document contains sensitive security information.
                 Unauthorized access, distribution, or disclosure is strictly prohibited.
+          <CardContent className="pt-6">
+            {/* Warning Banner */}
+            <Alert className="mb-6 border-amber-500/50 bg-amber-50/80 dark:bg-amber-500/10">
+              <AlertTriangle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800">
+                <strong>CONFIDENTIAL:</strong> This document contains sensitive security information 
+                about JamboRide&apos;s IT infrastructure. Unauthorized 
+                access, distribution, or disclosure is strictly prohibited.
               </AlertDescription>
             </Alert>
 
@@ -110,12 +146,20 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="h-12 rounded-xl border-primary/30 bg-background"
+                  className="h-12 border-border/80 bg-background/90 focus-visible:ring-2 focus-visible:ring-primary/40"
                   required
                 />
               </div>
 
               <div className="space-y-3">
                 <label className="flex items-start gap-3 rounded-xl border border-primary/30 px-4 py-3 hover:border-primary transition-colors cursor-pointer">
+              {/* Consent Checkboxes */}
+              <div className="space-y-4 rounded-xl border border-border/70 bg-muted/30 p-5">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <BadgeCheck className="h-4 w-4 text-primary" />
+                  Consent checklist
+                </div>
+                <div className="flex items-start gap-3">
                   <Checkbox
                     id="terms"
                     checked={agreedToTerms}
@@ -127,6 +171,12 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                     JamboRide, or have explicit authorization from JamboRide or Optin Technology Limited.
                   </span>
                 </label>
+                  <label htmlFor="terms" className="text-sm text-foreground leading-relaxed cursor-pointer">
+                    <span className="font-medium">Terms of Access:</span> I confirm that I am an 
+                    authorized representative of JamboRide or 
+                    have been explicitly granted access to this document by JamboRide or Optin Technology Limited.
+                  </label>
+                </div>
 
                 <label className="flex items-start gap-3 rounded-xl border border-primary/30 px-4 py-3 hover:border-primary transition-colors cursor-pointer">
                   <Checkbox
@@ -199,6 +249,23 @@ export function ConsentForm({ onEmailSubmit }: ConsentFormProps) {
                   )}
                 </Button>
               </div>
+              <Button
+                type="submit"
+                disabled={!allAgreed || !isValidEmail || isLoading}
+                className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-2">
+                    <Spinner className="h-4 w-4" />
+                    Sending Verification Code...
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-2">
+                    <Lock className="h-4 w-4" />
+                    Request Access
+                  </span>
+                )}
+              </Button>
             </form>
 
             <div className="mt-6 border-t border-border pt-4 flex items-center gap-2 text-xs text-muted-foreground">
