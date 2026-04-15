@@ -345,7 +345,7 @@ export function AuditReport({ userEmail }: AuditReportProps) {
       </div>
 
       {/* ── Stat strip — full bleed ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 bg-primary print:hidden">
+      <div className="grid grid-cols-2 lg:grid-cols-4 bg-destructive print:hidden">
         {[
           { num: "8",    label: "Critical Issues Found" },
           { num: "~65%", label: "Estimated API Cost Reduction" },
