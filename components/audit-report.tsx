@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Accordion,
   AccordionContent,
@@ -14,15 +13,21 @@ import {
 import {
   CheckCircle2,
   AlertTriangle,
-  ChevronRight,
   Download,
   Lock,
   ExternalLink,
   Check,
+  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// Section data types
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface AuditReportProps {
+  userEmail?: string
+  onLogout?: () => void
+}
+
 interface Section {
   id: string
   number: string
@@ -32,6 +37,8 @@ interface Section {
     variant: "critical" | "done" | "next" | "future"
   }
 }
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const sections: Section[] = [
   { id: "s1", number: "01", title: "Root Cause Analysis", badge: { text: "8 Issues", variant: "critical" } },
@@ -44,11 +51,13 @@ const sections: Section[] = [
   { id: "s8", number: "08", title: "Implementation & Migration Plan", badge: { text: "Active", variant: "next" } },
 ]
 
+// ─── Shared micro-components ──────────────────────────────────────────────────
+
 const badgeVariants = {
-  critical: "bg-ember/15 text-[#f4906e] border-ember/25",
-  done: "bg-ok/15 text-[#4fd490] border-ok/25",
-  next: "bg-gold-dim text-gold2 border-border-gold",
-  future: "bg-info/10 text-[#79bfff] border-info/20",
+  critical: "bg-destructive/15 text-destructive border-destructive/25",
+  done: "bg-green-500/15 text-green-400 border-green-500/25",
+  next: "bg-primary/10 text-primary border-primary/20",
+  future: "bg-blue-500/10 text-blue-400 border-blue-500/20",
 }
 
 function SectionBadge({ text, variant }: { text: string; variant: keyof typeof badgeVariants }) {
@@ -62,23 +71,33 @@ function SectionBadge({ text, variant }: { text: string; variant: keyof typeof b
 
 function CodeBlock({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <pre className={cn(
-      "bg-[#0d1510] border border-border-light rounded-lg p-5 overflow-x-auto font-mono text-xs leading-relaxed text-[#a8c4a0]",
-      className
-    )}>
+    <pre
+      className={cn(
+        "bg-muted/50 border border-border rounded-lg p-5 overflow-x-auto font-mono text-xs leading-relaxed text-muted-foreground",
+        className
+      )}
+    >
       {children}
     </pre>
   )
 }
 
-function Callout({ children, variant = "default" }: { children: React.ReactNode; variant?: "default" | "danger" | "done" }) {
+function Callout({
+  children,
+  variant = "default",
+}: {
+  children: React.ReactNode
+  variant?: "default" | "danger" | "done"
+}) {
   return (
-    <div className={cn(
-      "border-l-2 rounded-r-lg p-4 text-sm leading-relaxed",
-      variant === "default" && "border-gold bg-gold-dim/60 text-surface/65",
-      variant === "danger" && "border-ember bg-ember/7 text-surface/65",
-      variant === "done" && "border-ok bg-ok/7 text-surface/65",
-    )}>
+    <div
+      className={cn(
+        "border-l-2 rounded-r-lg p-4 text-sm leading-relaxed",
+        variant === "default" && "border-primary bg-primary/5 text-muted-foreground",
+        variant === "danger" && "border-destructive bg-destructive/5 text-muted-foreground",
+        variant === "done" && "border-green-500 bg-green-500/5 text-muted-foreground"
+      )}
+    >
       {children}
     </div>
   )
@@ -86,36 +105,49 @@ function Callout({ children, variant = "default" }: { children: React.ReactNode;
 
 function StepDone({ title, description }: { title: React.ReactNode; description: string }) {
   return (
-    <div className="flex gap-4 py-4 border-b border-border-light last:border-b-0">
-      <div className="w-6 h-6 rounded-full bg-ok/20 border border-ok/40 flex items-center justify-center flex-shrink-0 mt-0.5">
-        <CheckCircle2 className="h-3.5 w-3.5 text-[#4fd490]" />
+    <div className="flex gap-4 py-4 border-b border-border last:border-b-0">
+      <div className="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
       </div>
       <div className="flex-1">
-        <div className="text-sm font-semibold text-surface/85 mb-1">{title}</div>
-        <div className="text-[13px] text-surface/45 leading-relaxed">{description}</div>
+        <div className="text-sm font-semibold text-foreground mb-1">{title}</div>
+        <div className="text-[13px] text-muted-foreground leading-relaxed">{description}</div>
       </div>
     </div>
   )
 }
 
-function IssueCard({ title, pill, children }: { title: string; pill: { text: string; variant: "red" | "amber" | "green" | "blue" }; children: React.ReactNode }) {
+function IssueCard({
+  title,
+  pill,
+  children,
+}: {
+  title: string
+  pill: { text: string; variant: "red" | "amber" | "green" | "blue" }
+  children: React.ReactNode
+}) {
   const pillStyles = {
-    red: "bg-ember/15 text-[#f4906e]",
-    amber: "bg-gold-dim text-gold2",
-    green: "bg-ok/12 text-[#4fd490]",
-    blue: "bg-info/12 text-[#79bfff]",
+    red: "bg-destructive/15 text-destructive",
+    amber: "bg-amber-500/15 text-amber-400",
+    green: "bg-green-500/12 text-green-400",
+    blue: "bg-blue-500/12 text-blue-400",
   }
-  
+
   return (
-    <Card className="bg-surface/3 border-border-light">
+    <Card className="bg-card border-border">
       <CardContent className="p-5">
         <div className="flex items-center gap-2 mb-2.5">
-          <span className={cn("font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full", pillStyles[pill.variant])}>
+          <span
+            className={cn(
+              "font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full",
+              pillStyles[pill.variant]
+            )}
+          >
             {pill.text}
           </span>
-          <span className="text-[13px] font-semibold text-surface/80">{title}</span>
+          <span className="text-[13px] font-semibold text-foreground">{title}</span>
         </div>
-        <div className="text-[13.5px] text-surface/55 leading-relaxed">{children}</div>
+        <div className="text-[13.5px] text-muted-foreground leading-relaxed">{children}</div>
       </CardContent>
     </Card>
   )
@@ -123,16 +155,18 @@ function IssueCard({ title, pill, children }: { title: string; pill: { text: str
 
 function StackCard({ tech, description }: { tech: string; description: React.ReactNode }) {
   return (
-    <Card className="bg-surface/3 border-border-light hover:border-border-gold transition-colors">
+    <Card className="bg-card border-border hover:border-primary/40 transition-colors">
       <CardContent className="p-5">
-        <div className="font-bold text-sm text-surface/85 mb-1.5">{tech}</div>
-        <div className="text-[12.5px] text-surface/40 leading-relaxed">{description}</div>
+        <div className="font-bold text-sm text-foreground mb-1.5">{tech}</div>
+        <div className="text-[12.5px] text-muted-foreground leading-relaxed">{description}</div>
       </CardContent>
     </Card>
   )
 }
 
-export function AuditReport() {
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
   const [activeSection, setActiveSection] = useState("s1")
 
   const scrollToSection = (sectionId: string) => {
@@ -145,67 +179,81 @@ export function AuditReport() {
 
   return (
     <div className="w-full">
-      {/* Print Strip */}
-      <div className="bg-gold-dim/60 border-b border-border-gold px-8 py-2.5 flex items-center justify-between text-[10px] font-mono tracking-wider uppercase text-gold/60">
-        <span>Prepared by Optin Digital Solutions Ltd - optin.co.tz</span>
-        <span className="text-gold">Client: Jamboride - April 2026</span>
+      {/* Print / Access Strip */}
+      <div className="bg-primary/5 border-b border-primary/20 px-8 py-2.5 flex items-center justify-between text-[10px] font-mono tracking-wider uppercase text-primary/60">
+        <span>Prepared by Optin Digital Solutions Ltd — optin.co.tz</span>
+        <div className="flex items-center gap-4">
+          <span className="text-primary">Client: Jamboride — April 2026</span>
+          {userEmail && (
+            <span className="text-muted-foreground hidden sm:inline">
+              Viewing as: {userEmail}
+            </span>
+          )}
+          {onLogout && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1 text-muted-foreground hover:text-destructive transition-colors"
+            >
+              <LogOut className="h-3 w-3" />
+              Sign out
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Hero Section */}
       <section className="relative py-20 px-10 max-w-[900px] mx-auto">
-        <div className="absolute top-0 right-[-20%] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(201,162,39,0.06)_0%,transparent_70%)] pointer-events-none" />
-        
-        <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-widest uppercase text-gold mb-6">
-          <span>Technical Audit Report - April 2026</span>
-          <div className="flex-1 h-px bg-border-gold max-w-[120px]" />
+        <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-widest uppercase text-primary mb-6">
+          <span>Technical Audit Report — April 2026</span>
+          <div className="flex-1 h-px bg-primary/20 max-w-[120px]" />
         </div>
-        
-        <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-surface mb-3.5">
+
+        <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-foreground mb-3.5">
           Jamboride<br />
-          Architecture & <em className="italic text-gold">Cost</em><br />
+          Architecture & <em className="italic text-primary">Cost</em><br />
           Optimization Audit
         </h1>
-        
-        <p className="text-[15px] text-surface/40 font-mono tracking-wide mb-12">
-          Flutter - Firebase - Google Maps / Directions APIs
+
+        <p className="text-[15px] text-muted-foreground font-mono tracking-wide mb-12">
+          Flutter — Firebase — Google Maps / Directions APIs
         </p>
-        
+
         {/* Meta Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 border border-border-light rounded-[14px] overflow-hidden bg-surface/2">
-          <div className="p-5 border-r border-border-light">
-            <label className="font-mono text-[9px] tracking-widest uppercase text-surface/25 block mb-1.5">Scope</label>
-            <span className="text-[13px] text-surface/70 font-medium">Customer App & Driver App (Flutter)</span>
+        <div className="grid grid-cols-2 lg:grid-cols-4 border border-border rounded-[14px] overflow-hidden bg-card">
+          <div className="p-5 border-r border-border">
+            <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/60 block mb-1.5">Scope</label>
+            <span className="text-[13px] text-foreground font-medium">Customer App & Driver App (Flutter)</span>
           </div>
-          <div className="p-5 border-r border-border-light">
-            <label className="font-mono text-[9px] tracking-widest uppercase text-surface/25 block mb-1.5">Backend</label>
-            <span className="text-[13px] text-surface/70 font-medium">Firebase (Firestore + Auth + Storage)</span>
+          <div className="p-5 border-r border-border">
+            <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/60 block mb-1.5">Backend</label>
+            <span className="text-[13px] text-foreground font-medium">Firebase (Firestore + Auth + Storage)</span>
           </div>
-          <div className="p-5 border-r border-border-light">
-            <label className="font-mono text-[9px] tracking-widest uppercase text-surface/25 block mb-1.5">Maps Stack</label>
-            <span className="text-[13px] text-surface/70 font-medium">Google Maps, Directions, Distance Matrix, Places</span>
+          <div className="p-5 border-r border-border">
+            <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/60 block mb-1.5">Maps Stack</label>
+            <span className="text-[13px] text-foreground font-medium">Google Maps, Directions, Distance Matrix, Places</span>
           </div>
           <div className="p-5">
-            <label className="font-mono text-[9px] tracking-widest uppercase text-surface/25 block mb-1.5">Audited By</label>
-            <span className="text-[13px] text-surface/70 font-medium">Optin Digital Solutions Ltd</span>
+            <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/60 block mb-1.5">Audited By</label>
+            <span className="text-[13px] text-foreground font-medium">Optin Digital Solutions Ltd</span>
           </div>
         </div>
       </section>
 
       {/* Stat Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 bg-gold">
-        <div className="p-5 sm:p-6 border-r border-black/12 text-void">
+      <div className="grid grid-cols-2 lg:grid-cols-4 bg-primary">
+        <div className="p-5 sm:p-6 border-r border-black/12 text-primary-foreground">
           <div className="font-serif text-3xl sm:text-4xl font-black leading-none tracking-tight">8</div>
           <div className="font-mono text-[9px] tracking-wider uppercase opacity-65 mt-1.5">Critical Issues Found</div>
         </div>
-        <div className="p-5 sm:p-6 border-r border-black/12 text-void">
+        <div className="p-5 sm:p-6 border-r border-black/12 text-primary-foreground">
           <div className="font-serif text-3xl sm:text-4xl font-black leading-none tracking-tight">~65%</div>
           <div className="font-mono text-[9px] tracking-wider uppercase opacity-65 mt-1.5">Estimated API Cost Reduction</div>
         </div>
-        <div className="p-5 sm:p-6 border-r border-black/12 text-void">
+        <div className="p-5 sm:p-6 border-r border-black/12 text-primary-foreground">
           <div className="font-serif text-3xl sm:text-4xl font-black leading-none tracking-tight">5</div>
           <div className="font-mono text-[9px] tracking-wider uppercase opacity-65 mt-1.5">Google API Endpoints Audited</div>
         </div>
-        <div className="p-5 sm:p-6 text-void">
+        <div className="p-5 sm:p-6 text-primary-foreground">
           <div className="font-serif text-3xl sm:text-4xl font-black leading-none tracking-tight">3</div>
           <div className="font-mono text-[9px] tracking-wider uppercase opacity-65 mt-1.5">Migration Phases Planned</div>
         </div>
@@ -214,17 +262,19 @@ export function AuditReport() {
       {/* Body Content */}
       <div className="max-w-[900px] mx-auto px-10 py-16">
         {/* Table of Contents */}
-        <Card className="bg-surface/2 border-border-light rounded-[14px] mb-14">
+        <Card className="bg-card border-border rounded-[14px] mb-14">
           <CardContent className="p-7">
-            <div className="font-mono text-[9px] tracking-widest uppercase text-surface/25 mb-4">Table of Contents</div>
+            <div className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/50 mb-4">
+              Table of Contents
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {sections.map((section) => (
                 <button
                   key={section.id}
                   onClick={() => scrollToSection(section.id)}
-                  className="text-left text-[13px] text-surface/55 hover:text-gold transition-colors leading-snug flex items-center gap-2"
+                  className="text-left text-[13px] text-muted-foreground hover:text-primary transition-colors leading-snug flex items-center gap-2"
                 >
-                  <span className="font-mono text-[10px] text-gold/70">{section.number} —</span>
+                  <span className="font-mono text-[10px] text-primary/70">{section.number} —</span>
                   {section.title}
                 </button>
               ))}
@@ -232,592 +282,704 @@ export function AuditReport() {
           </CardContent>
         </Card>
 
-        {/* Section 1: Root Cause Analysis */}
+        {/* ── Section 1: Root Cause Analysis ── */}
         <section id="s1" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">01</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Root Cause Analysis (Code-Level)</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">01</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Root Cause Analysis (Code-Level)
+            </h2>
             <SectionBadge text="8 Issues" variant="critical" />
           </div>
 
-          <p className="text-[14.5px] text-surface/60 leading-relaxed mb-6">
-            After a full read of both codebases — specifically <code className="font-mono text-xs bg-surface/6 border border-surface/8 rounded px-1.5 py-0.5 text-gold2">home_controller.dart</code>, <code className="font-mono text-xs bg-surface/6 border border-surface/8 rounded px-1.5 py-0.5 text-gold2">live_tracking_controller.dart</code>, <code className="font-mono text-xs bg-surface/6 border border-surface/8 rounded px-1.5 py-0.5 text-gold2">fire_store_utils.dart</code>, and all controller classes — the following systemic issues were identified as driving the majority of API cost.
+          <p className="text-[14.5px] text-muted-foreground leading-relaxed mb-6">
+            After a full read of both codebases — specifically{" "}
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
+              home_controller.dart
+            </code>
+            ,{" "}
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
+              live_tracking_controller.dart
+            </code>
+            ,{" "}
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
+              fire_store_utils.dart
+            </code>
+            , and all controller classes — the following systemic issues were identified as driving the majority of API cost.
           </p>
 
           <Accordion type="single" collapsible className="space-y-3">
-            <AccordionItem value="issue-1" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-1" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-ember flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 1 — distanceFilter: 1 Meter (Most Expensive Single Line)</span>
+                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 1 — distanceFilter: 1 Meter (Most Expensive Single Line)
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <Callout variant="danger">
-                  <strong className="text-surface/85">Critical.</strong> Both apps set <code className="font-mono text-xs text-gold2">distanceFilter: 1</code> with <code className="font-mono text-xs text-gold2">accuracy: LocationAccuracy.bestForNavigation</code>. At GPS accuracy of ~3–5m, this fires a location event every 1 meter of movement, producing up to 5,000 location ticks per hour at 90 km/h. Every tick triggers a Firestore <code className="font-mono text-xs text-gold2">update()</code> write and — during active trips — a potential route recalculation.
+                  <strong className="text-foreground">Critical.</strong> Both apps set{" "}
+                  <code className="font-mono text-xs text-primary">distanceFilter: 1</code> with{" "}
+                  <code className="font-mono text-xs text-primary">accuracy: LocationAccuracy.bestForNavigation</code>.
+                  At GPS accuracy of ~3–5m, this fires a location event every 1 meter of movement, producing up to 5,000
+                  location ticks per hour at 90 km/h. Every tick triggers a Firestore{" "}
+                  <code className="font-mono text-xs text-primary">update()</code> write and — during active trips — a
+                  potential route recalculation.
                 </Callout>
                 <CodeBlock className="mt-4">
-                  <span className="text-[#4a5e48]">{"// DRIVER — home_controller.dart:518"}</span>{"\n"}
-                  <span className="text-[#4a5e48]">{"// CUSTOMER — home_controller.dart:1391"}</span>{"\n"}
+                  {"// DRIVER — home_controller.dart:518\n"}
+                  {"// CUSTOMER — home_controller.dart:1391\n"}
                   {"Geolocator.getPositionStream(\n"}
-                  {"  locationSettings: "}<span className="text-[#e8a030]">const</span>{" LocationSettings(\n"}
+                  {"  locationSettings: const LocationSettings(\n"}
                   {"    accuracy: LocationAccuracy.bestForNavigation,\n"}
-                  {"    distanceFilter: "}<span className="text-[#d98877]">1</span>{",  "}<span className="text-[#4a5e48]">{"// ← fires every 1 metre !!!"}</span>{"\n"}
+                  {"    distanceFilter: 1,  // ← fires every 1 metre !!!\n"}
                   {"  ),\n"}
                   {")"}
                 </CodeBlock>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-2" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-2" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-ember flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 2 — Directions API Called on Every Firebase Snapshot</span>
+                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 2 — Directions API Called on Every Firebase Snapshot
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <Callout variant="danger">
-                  <strong className="text-surface/85">Critical.</strong> Both <code className="font-mono text-xs text-gold2">LiveTrackingController.getPolyline()</code> (customer) and the driver&apos;s equivalent call <code className="font-mono text-xs text-gold2">polylinePoints.getRouteBetweenCoordinates()</code> — which hits the Google Directions API — <em>inside a Firestore snapshot listener</em>. The driver document is updated continuously (see Issue 1), so every location write causes both apps to independently call the Directions API.
+                  <strong className="text-foreground">Critical.</strong> Both{" "}
+                  <code className="font-mono text-xs text-primary">LiveTrackingController.getPolyline()</code> (customer)
+                  and the driver&apos;s equivalent call{" "}
+                  <code className="font-mono text-xs text-primary">
+                    polylinePoints.getRouteBetweenCoordinates()
+                  </code>{" "}
+                  — which hits the Google Directions API — <em>inside a Firestore snapshot listener</em>. The driver
+                  document is updated continuously (see Issue 1), so every location write causes both apps to
+                  independently call the Directions API.
                 </Callout>
-                <p className="text-[14px] text-surface/60 leading-relaxed mt-4">
-                  With <code className="font-mono text-xs text-gold2">distanceFilter: 1</code>, a 10-minute ride at 50 km/h produces ~833 snapshot events. Both apps call Directions API on each: <strong className="text-surface/85">~1,666 Directions API calls per trip</strong>. At $0.005/call, that&apos;s $8.33 per ride in Directions costs alone.
+                <p className="text-[14px] text-muted-foreground leading-relaxed mt-4">
+                  With <code className="font-mono text-xs text-primary">distanceFilter: 1</code>, a 10-minute ride at
+                  50 km/h produces ~833 snapshot events. Both apps call Directions API on each:{" "}
+                  <strong className="text-foreground">~1,666 Directions API calls per trip</strong>. At $0.005/call,
+                  that&apos;s $8.33 per ride in Directions costs alone.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-3" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-3" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-gold flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 3 — shouldReRoute Threshold of 20 Meters is Too Aggressive</span>
+                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 3 — shouldReRoute Threshold of 20 Meters is Too Aggressive
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
-                <p className="text-[14px] text-surface/60 leading-relaxed">
-                  Both apps implement a <code className="font-mono text-xs text-gold2">shouldReRoute()</code> guard that allows a new Directions API call every 20 meters of driver movement. At 50 km/h, the driver crosses 20m every 1.44 seconds — triggering a route refresh every ~1.5 seconds throughout the trip.
+                <p className="text-[14px] text-muted-foreground leading-relaxed">
+                  Both apps implement a{" "}
+                  <code className="font-mono text-xs text-primary">shouldReRoute()</code> guard that allows a new
+                  Directions API call every 20 meters of driver movement. At 50 km/h, the driver crosses 20m every 1.44
+                  seconds — triggering a route refresh every ~1.5 seconds throughout the trip.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-4" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-4" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-ember flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 4 — Duplicate Location Tracking Stack</span>
+                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 4 — Duplicate Location Tracking Stack
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
-                <p className="text-[14px] text-surface/60 leading-relaxed">
-                  The Driver app runs <em>two simultaneous location stacks</em>: <code className="font-mono text-xs text-gold2">Geolocator.getPositionStream()</code> and <code className="font-mono text-xs text-gold2">location.onLocationChanged.listen()</code> — both running concurrently. Every physical movement triggers <em>two</em> Firestore writes and two downstream cascades, directly doubling all location-related costs.
+                <p className="text-[14px] text-muted-foreground leading-relaxed">
+                  The Driver app runs <em>two simultaneous location stacks</em>:{" "}
+                  <code className="font-mono text-xs text-primary">Geolocator.getPositionStream()</code> and{" "}
+                  <code className="font-mono text-xs text-primary">location.onLocationChanged.listen()</code> — both
+                  running concurrently. Every physical movement triggers <em>two</em> Firestore writes and two downstream
+                  cascades, directly doubling all location-related costs.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-5" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-5" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-ember flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 5 — Nested Firestore Listeners (Memory Leaks)</span>
+                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 5 — Nested Firestore Listeners (Memory Leaks)
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
-                <p className="text-[14px] text-surface/60 leading-relaxed mb-4">
-                  The inner listener is opened inside the outer listener&apos;s callback with no reference stored. After 5 minutes of a trip, there are dozens of orphaned listeners all calling <code className="font-mono text-xs text-gold2">getPolyline()</code> simultaneously.
+                <p className="text-[14px] text-muted-foreground leading-relaxed mb-4">
+                  The inner listener is opened inside the outer listener&apos;s callback with no reference stored. After
+                  5 minutes of a trip, there are dozens of orphaned listeners all calling{" "}
+                  <code className="font-mono text-xs text-primary">getPolyline()</code> simultaneously.
                 </p>
                 <CodeBlock>
-                  <span className="text-[#4a5e48]">{"// live_tracking_controller.dart — same pattern in BOTH apps"}</span>{"\n"}
-                  {"FirebaseFirestore.instance.collection("}<span className="text-[#6aaa7a]">{`'orders'`}</span>{").doc(orderId)\n"}
-                  {"  ."}<span className="text-[#78b8dc]">snapshots</span>{"()."}<span className="text-[#78b8dc]">listen</span>{"((orderEvent) {\n"}
-                  {"    "}<span className="text-[#4a5e48]">{"// Inner listener opened on EVERY outer event — never cancelled!"}</span>{"\n"}
-                  {"    FirebaseFirestore.instance.collection("}<span className="text-[#6aaa7a]">{`'driver_users'`}</span>{").doc(driverId)\n"}
-                  {"      ."}<span className="text-[#78b8dc]">snapshots</span>{"()."}<span className="text-[#78b8dc]">listen</span>{"((driverEvent) {\n"}
-                  {"        "}<span className="text-[#78b8dc]">getPolyline</span>{"(...);  "}<span className="text-[#4a5e48]">{"// ← Directions API every write"}</span>{"\n"}
+                  {"// live_tracking_controller.dart — same pattern in BOTH apps\n"}
+                  {"FirebaseFirestore.instance.collection('orders').doc(orderId)\n"}
+                  {"  .snapshots().listen((orderEvent) {\n"}
+                  {"    // Inner listener opened on EVERY outer event — never cancelled!\n"}
+                  {"    FirebaseFirestore.instance.collection('driver_users').doc(driverId)\n"}
+                  {"      .snapshots().listen((driverEvent) {\n"}
+                  {"        getPolyline(...);  // ← Directions API every write\n"}
                   {"      });\n"}
                   {"  });"}
                 </CodeBlock>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-6" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-6" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-gold flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 6 — Places Autocomplete + Distance Matrix on Every Keystroke</span>
+                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 6 — Places Autocomplete + Distance Matrix on Every Keystroke
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
-                <p className="text-[14px] text-surface/60 leading-relaxed">
-                  The customer&apos;s destination search calls both the Places Autocomplete API and Distance Matrix API on every character typed, with no debounce. Typing &quot;Dar es Salaam Airport&quot; (19 chars) fires 19 Autocomplete + 19 Distance Matrix calls.
+                <p className="text-[14px] text-muted-foreground leading-relaxed">
+                  The customer&apos;s destination search calls both the Places Autocomplete API and Distance Matrix API
+                  on every character typed, with no debounce. Typing &quot;Dar es Salaam Airport&quot; (19 chars) fires
+                  19 Autocomplete + 19 Distance Matrix calls.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-7" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-7" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-gold flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 7 — Nearby Places API Called on Every App Open</span>
+                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 7 — Nearby Places API Called on Every App Open
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
-                <p className="text-[14px] text-surface/60 leading-relaxed">
-                  On home screen load, <code className="font-mono text-xs text-gold2">fetchNearbyPlacesWhere()</code> fires a Nearby Search + Distance Matrix immediately, with no caching. Every time a user opens the app, these calls are made regardless of whether their location has changed.
+                <p className="text-[14px] text-muted-foreground leading-relaxed">
+                  On home screen load,{" "}
+                  <code className="font-mono text-xs text-primary">fetchNearbyPlacesWhere()</code> fires a Nearby
+                  Search + Distance Matrix immediately, with no caching. Every time a user opens the app, these calls
+                  are made regardless of whether their location has changed.
                 </p>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="issue-8" className="border border-border-light rounded-lg px-4 bg-surface/2">
+            <AccordionItem value="issue-8" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-gold flex-shrink-0" />
-                  <span className="font-medium text-surface text-sm">Issue 8 — Background Location Mode Always Enabled</span>
+                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <span className="font-medium text-foreground text-sm">
+                    Issue 8 — Background Location Mode Always Enabled
+                  </span>
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pb-4">
                 <CodeBlock>
-                  <span className="text-[#4a5e48]">{"// driver/home_controller.dart:2040"}</span>{"\n"}
-                  {"location."}<span className="text-[#78b8dc]">enableBackgroundMode</span>{"(enable: "}<span className="text-[#e8a030]">true</span>{");\n"}
-                  <span className="text-[#4a5e48]">{"// distanceFilter is commented out — updates Firestore continuously:"}</span>{"\n"}
-                  <span className="text-[#4a5e48]">{"// location.changeSettings(accuracy: LocationAccuracy.high, distanceFilter: 3);"}</span>
+                  {"// driver/home_controller.dart:2040\n"}
+                  {"location.enableBackgroundMode(enable: true);\n"}
+                  {"// distanceFilter is commented out — updates Firestore continuously:\n"}
+                  {"// location.changeSettings(accuracy: LocationAccuracy.high, distanceFilter: 3);"}
                 </CodeBlock>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
         </section>
 
-        {/* Section 2: Code & Architecture Weaknesses */}
+        {/* ── Section 2: Code & Architecture Weaknesses ── */}
         <section id="s2" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">02</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Code & Architecture Weaknesses</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">02</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Code & Architecture Weaknesses
+            </h2>
             <SectionBadge text="Systemic" variant="critical" />
           </div>
 
           <div className="space-y-4 mb-8">
-            <IssueCard title="Unconditional real-time listeners on frequently-written documents" pill={{ text: "High Cost", variant: "red" }}>
-              The <code className="font-mono text-xs text-gold2">driver_users</code> document is written to on every location update. Both apps attach <code className="font-mono text-xs text-gold2">.snapshots().listen()</code> to this document. Firestore charges a read for every snapshot event. With <code className="font-mono text-xs text-gold2">distanceFilter: 1</code>, a 20-minute trip produces ~1,000+ document reads per listener — and there are multiple listeners on the same document.
+            <IssueCard
+              title="Unconditional real-time listeners on frequently-written documents"
+              pill={{ text: "High Cost", variant: "red" }}
+            >
+              The <code className="font-mono text-xs text-primary">driver_users</code> document is written to on every
+              location update. Both apps attach{" "}
+              <code className="font-mono text-xs text-primary">.snapshots().listen()</code> to this document. Firestore
+              charges a read for every snapshot event. With{" "}
+              <code className="font-mono text-xs text-primary">distanceFilter: 1</code>, a 20-minute trip produces
+              ~1,000+ document reads per listener — and there are multiple listeners on the same document.
             </IssueCard>
 
-            <IssueCard title="Unmanaged StreamSubscriptions leading to zombie listeners" pill={{ text: "Memory Leak", variant: "red" }}>
-              Inner <code className="font-mono text-xs text-gold2">StreamSubscription</code> objects created inside outer listener callbacks are never stored in a variable. They cannot be <code className="font-mono text-xs text-gold2">cancel()</code>-ed in <code className="font-mono text-xs text-gold2">onClose()</code>, creating permanent memory leaks and duplicate API calls that compound over a trip&apos;s duration.
+            <IssueCard
+              title="Unmanaged StreamSubscriptions leading to zombie listeners"
+              pill={{ text: "Memory Leak", variant: "red" }}
+            >
+              Inner <code className="font-mono text-xs text-primary">StreamSubscription</code> objects created inside
+              outer listener callbacks are never stored in a variable. They cannot be{" "}
+              <code className="font-mono text-xs text-primary">cancel()</code>-ed in{" "}
+              <code className="font-mono text-xs text-primary">onClose()</code>, creating permanent memory leaks and
+              duplicate API calls that compound over a trip&apos;s duration.
             </IssueCard>
 
-            <IssueCard title="Mobile apps make all Google API calls directly — no shared cache" pill={{ text: "Architecture", variant: "amber" }}>
-              Every mobile client calls Maps/Directions/Places APIs independently. There is no shared caching layer, no rate limiting, and no opportunity to deduplicate — e.g., if 50 customers are all near the same area, each makes their own independent Nearby Search call for the same data.
+            <IssueCard
+              title="Mobile apps make all Google API calls directly — no shared cache"
+              pill={{ text: "Architecture", variant: "amber" }}
+            >
+              Every mobile client calls Maps/Directions/Places APIs independently. There is no shared caching layer, no
+              rate limiting, and no opportunity to deduplicate — e.g., if 50 customers are all near the same area, each
+              makes their own independent Nearby Search call for the same data.
             </IssueCard>
           </div>
 
-          <h3 className="font-mono text-[11px] tracking-wider uppercase text-surface/75 mb-4 mt-8">Scalability Projection</h3>
+          <h3 className="font-mono text-[11px] tracking-wider uppercase text-foreground/75 mb-4 mt-8">
+            Scalability Projection
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-[13.5px] border-collapse">
               <thead>
-                <tr className="bg-surface/2">
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Issue</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Current Behaviour</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">At Scale (1,000 concurrent rides)</th>
+                <tr className="bg-card">
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Issue</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Current Behaviour</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">At Scale (1,000 concurrent rides)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Location writes per second</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~1 write/sec per driver</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">1,000 writes/sec - Firestore hot spots</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Directions API calls per trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~800–1,600 calls/trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Hitting Maps API daily quotas instantly</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Firestore reads per trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~2,000–4,000 reads/trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Firebase costs scale linearly, no bulk discount</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 text-surface/55">Nearby search caching</td>
-                  <td className="p-3 text-surface/55">None — per app open</td>
-                  <td className="p-3 text-surface/55">1,000 app opens = 1,000 redundant API calls</td>
-                </tr>
+                {[
+                  ["Location writes per second", "~1 write/sec per driver", "1,000 writes/sec — Firestore hot spots"],
+                  ["Directions API calls per trip", "~800–1,600 calls/trip", "Hitting Maps API daily quotas instantly"],
+                  ["Firestore reads per trip", "~2,000–4,000 reads/trip", "Firebase costs scale linearly, no bulk discount"],
+                  ["Nearby search caching", "None — per app open", "1,000 app opens = 1,000 redundant API calls"],
+                ].map(([issue, current, scale]) => (
+                  <tr key={issue} className="hover:bg-card">
+                    <td className="p-3 border-b border-border text-muted-foreground">{issue}</td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{current}</td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{scale}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </section>
 
-        {/* Section 3: Steps Taken — Phase 1 Complete */}
+        {/* ── Section 3: Steps Taken ── */}
         <section id="s3" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">03</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Steps Taken — Phase 1 Complete</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">03</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Steps Taken — Phase 1 Complete
+            </h2>
             <SectionBadge text="Done" variant="done" />
           </div>
 
           <Callout variant="done">
-            <strong className="text-[#7dd4a8]">Phase 1 has been successfully completed.</strong> All quick-win Flutter-only fixes have been implemented and deployed. The changes below were made directly to the customer and driver codebases with no infrastructure changes required. Estimated impact: <strong className="text-surface/85">45–55% reduction in API and Firestore costs</strong> from these changes alone.
+            <strong className="text-green-400">Phase 1 has been successfully completed.</strong> All quick-win
+            Flutter-only fixes have been implemented and deployed. Estimated impact:{" "}
+            <strong className="text-foreground">45–55% reduction in API and Firestore costs</strong> from these changes
+            alone.
           </Callout>
 
           <div className="mt-6">
-            <StepDone 
-              title={<>Corrected <code className="font-mono text-xs text-gold2">distanceFilter</code> values across both apps</>}
-              description="Changed from distanceFilter: 1 to adaptive values: 15m when idle, 8m en-route to pickup, and 5m during active trip navigation. Both customer and driver apps updated. This single change accounts for an estimated 40–50% reduction in location writes and downstream API cascades."
+            <StepDone
+              title={<>Corrected <code className="font-mono text-xs text-primary">distanceFilter</code> values across both apps</>}
+              description="Changed from distanceFilter: 1 to adaptive values: 15m when idle, 8m en-route to pickup, and 5m during active trip navigation. This single change accounts for an estimated 40–50% reduction in location writes and downstream API cascades."
             />
-            <StepDone 
+            <StepDone
               title="Removed the duplicate location tracking stack in Driver app"
-              description="The location.onLocationChanged.listen() block inside enableLocationServices() was removed entirely. All location handling is now consolidated into the single Geolocator.getPositionStream() in startTrackingDriver(). This eliminated a full doubling of all location-related Firestore writes and downstream costs."
+              description="The location.onLocationChanged.listen() block inside enableLocationServices() was removed entirely. All location handling is now consolidated into the single Geolocator.getPositionStream(). This eliminated a full doubling of all location-related Firestore writes and downstream costs."
             />
-            <StepDone 
+            <StepDone
               title="Stored and cancelled all StreamSubscriptions — zombie listeners eliminated"
-              description="All .listen() calls were audited across both codebases. Every subscription is now assigned to a named StreamSubscription? variable and cancelled in onClose(). Nested listeners were refactored to flat, parallel subscriptions. The inner subscription leak in live_tracking_controller.dart was fixed in both apps."
+              description="All .listen() calls were audited across both codebases. Every subscription is now assigned to a named StreamSubscription? variable and cancelled in onClose(). Nested listeners were refactored to flat, parallel subscriptions."
             />
-            <StepDone 
+            <StepDone
               title="Implemented client-side polyline trimming — in-trip Directions API calls eliminated"
               description="The getPolyline() call inside the monitorTrip driver listener was replaced with a pure client-side trimPolyline() function. The Directions API is now called only when the driver deviates more than 80m from the polyline corridor. Estimated reduction: 70–85% of in-trip Directions API calls."
             />
-            <StepDone 
+            <StepDone
               title="Added 300ms debounce and 3-character minimum to destination search"
               description="A Timer-based debounce was added to the customer app's onSearchChanged() handler. Autocomplete calls now fire only after 300ms of typing inactivity and require at least 3 characters. Estimated reduction: 60–80% of Places Autocomplete calls."
             />
-            <StepDone 
+            <StepDone
               title="Implemented nearby places result caching (10-minute TTL, 200m movement threshold)"
               description="The fetchNearbyPlacesWhere() call on app open is now gated by a cache check. Results are reused for 10 minutes if the user's position has not moved more than 200m from the last fetch position."
             />
-            <StepDone 
-              title={<>Re-enabled background location <code className="font-mono text-xs text-gold2">distanceFilter: 20</code> in Driver app</>}
+            <StepDone
+              title={<>Re-enabled background location <code className="font-mono text-xs text-primary">distanceFilter: 20</code> in Driver app</>}
               description="The location.changeSettings(distanceFilter: 20) call that had been commented out in home_controller.dart was restored. Background location accuracy was also lowered to LocationAccuracy.balanced while backgrounded."
             />
           </div>
 
-          <Callout variant="done" >
-            <strong className="text-[#7dd4a8]">Validation:</strong> All Phase 1 changes were tested in the Jamboride staging environment for one week prior to production deployment. API call volume telemetry confirmed a measured reduction consistent with projections before the production release.
+          <Callout variant="done">
+            <strong className="text-green-400">Validation:</strong> All Phase 1 changes were tested in the Jamboride
+            staging environment for one week prior to production deployment. API call volume telemetry confirmed a
+            measured reduction consistent with projections before the production release.
           </Callout>
         </section>
 
-        {/* Section 4: Refactored Architecture Proposal */}
+        {/* ── Section 4: Architecture Proposal ── */}
         <section id="s4" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">04</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Refactored Architecture Proposal</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">04</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Refactored Architecture Proposal
+            </h2>
             <SectionBadge text="Phase 2-3" variant="next" />
           </div>
 
-          <p className="text-[14.5px] text-surface/60 leading-relaxed mb-6">
-            The core architectural change is to move all Google API calls from mobile clients to a backend service. Mobile apps should only communicate with your own backend, which acts as a smart proxy with caching, deduplication, and cost controls.
+          <p className="text-[14.5px] text-muted-foreground leading-relaxed mb-6">
+            The core architectural change is to move all Google API calls from mobile clients to a backend service.
+            Mobile apps should only communicate with your own backend, which acts as a smart proxy with caching,
+            deduplication, and cost controls.
           </p>
 
-          <h3 className="font-mono text-[11px] tracking-wider uppercase text-surface/75 mb-4 mt-8">Key Architecture Principles</h3>
-          <ul className="space-y-3 text-[13.5px] text-surface/55 leading-relaxed pl-5">
-            <li className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-gold/50">
-              <strong className="text-surface/80">Mobile → Your Backend only.</strong> Apps never call google.com directly. All Maps/Directions/Places calls are proxied through your backend.
-            </li>
-            <li className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-gold/50">
-              <strong className="text-surface/80">Backend → Redis cache → Google APIs.</strong> Every route, ETA, and place result is cached in Redis. Repeated requests return cached data.
-            </li>
-            <li className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-gold/50">
-              <strong className="text-surface/80">Location via WebSocket, not Firestore polling.</strong> Driver location updates are broadcast over WebSocket. No Firestore document write per update; no downstream read cascade.
-            </li>
-            <li className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-gold/50">
-              <strong className="text-surface/80">Route calculated once per order.</strong> At order acceptance, the Route Service computes and stores the full polyline — trimmed client-side during the trip.
-            </li>
-            <li className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-gold/50">
-              <strong className="text-surface/80">Dispatch uses PostGIS geospatial queries.</strong> Finding nearby drivers uses a PostgreSQL + PostGIS radius query — not Firestore geohash queries.
-            </li>
+          <h3 className="font-mono text-[11px] tracking-wider uppercase text-foreground/75 mb-4 mt-8">
+            Key Architecture Principles
+          </h3>
+          <ul className="space-y-3 text-[13.5px] text-muted-foreground leading-relaxed pl-5">
+            {[
+              [
+                "Mobile → Your Backend only.",
+                "Apps never call google.com directly. All Maps/Directions/Places calls are proxied through your backend.",
+              ],
+              [
+                "Backend → Redis cache → Google APIs.",
+                "Every route, ETA, and place result is cached in Redis. Repeated requests return cached data.",
+              ],
+              [
+                "Location via WebSocket, not Firestore polling.",
+                "Driver location updates are broadcast over WebSocket. No Firestore document write per update; no downstream read cascade.",
+              ],
+              [
+                "Route calculated once per order.",
+                "At order acceptance, the Route Service computes and stores the full polyline — trimmed client-side during the trip.",
+              ],
+              [
+                "Dispatch uses PostGIS geospatial queries.",
+                "Finding nearby drivers uses a PostgreSQL + PostGIS radius query — not Firestore geohash queries.",
+              ],
+            ].map(([bold, rest]) => (
+              <li
+                key={bold as string}
+                className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-primary/50"
+              >
+                <strong className="text-foreground">{bold}</strong> {rest}
+              </li>
+            ))}
           </ul>
         </section>
 
-        {/* Section 5: Firebase Evaluation */}
+        {/* ── Section 5: Firebase Evaluation ── */}
         <section id="s5" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">05</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Firebase Evaluation</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">05</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Firebase Evaluation
+            </h2>
             <SectionBadge text="Hybrid Recommended" variant="next" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <Card className="bg-surface/3 border-border-light">
+            <Card className="bg-card border-border">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full bg-ok/12 text-[#4fd490]">Pros</span>
-                  <span className="text-[13px] font-semibold text-surface/80">Where Firebase works well</span>
+                  <span className="font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full bg-green-500/12 text-green-400">Pros</span>
+                  <span className="text-[13px] font-semibold text-foreground">Where Firebase works well</span>
                 </div>
-                <ul className="space-y-2 text-[13.5px] text-surface/55">
-                  <li>Real-time order status updates (Firestore listeners)</li>
-                  <li>Firebase Auth — battle-tested, phone number OTP works well</li>
-                  <li>Firebase Storage — driver document uploads</li>
-                  <li>FCM push notifications — reliable, cross-platform</li>
-                  <li>Fast initial deployment — no backend infra to manage</li>
+                <ul className="space-y-2 text-[13.5px] text-muted-foreground">
+                  {["Real-time order status updates (Firestore listeners)", "Firebase Auth — battle-tested, phone number OTP works well", "Firebase Storage — driver document uploads", "FCM push notifications — reliable, cross-platform", "Fast initial deployment — no backend infra to manage"].map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
 
-            <Card className="bg-surface/3 border-border-light">
+            <Card className="bg-card border-border">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full bg-ember/15 text-[#f4906e]">Cons</span>
-                  <span className="text-[13px] font-semibold text-surface/80">Where Firebase is hurting you</span>
+                  <span className="font-mono text-[9.5px] tracking-wider uppercase px-2 py-0.5 rounded-full bg-destructive/15 text-destructive">Cons</span>
+                  <span className="text-[13px] font-semibold text-foreground">Where Firebase is hurting you</span>
                 </div>
-                <ul className="space-y-2 text-[13.5px] text-surface/55">
-                  <li>Firestore pricing is per read/write — architecture writes thousands per ride</li>
-                  <li>No server-side logic — business rules embedded in mobile apps</li>
-                  <li>No native geospatial queries (geoflutterfire is a workaround)</li>
-                  <li>Vendor lock-in — hard to migrate once data is in Firestore</li>
-                  <li>Real-time listeners at scale create connection storm</li>
+                <ul className="space-y-2 text-[13.5px] text-muted-foreground">
+                  {["Firestore pricing is per read/write — architecture writes thousands per ride", "No server-side logic — business rules embedded in mobile apps", "No native geospatial queries (geoflutterfire is a workaround)", "Vendor lock-in — hard to migrate once data is in Firestore", "Real-time listeners at scale create connection storm"].map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
           </div>
 
-          <h3 className="font-mono text-[11px] tracking-wider uppercase text-surface/75 mb-4">Recommendation: Hybrid Architecture</h3>
+          <h3 className="font-mono text-[11px] tracking-wider uppercase text-foreground/75 mb-4">
+            Recommendation: Hybrid Architecture
+          </h3>
           <Callout variant="done">
-            <strong className="text-[#7dd4a8]">Keep Firebase for:</strong> Auth (phone OTP), FCM push notifications, and Firebase Storage for document uploads.<br /><br />
-            <strong className="text-[#7dd4a8]">Replace with custom backend for:</strong> All location updates, ride matching, route calculations, order management, and real-time position streaming.
+            <strong className="text-green-400">Keep Firebase for:</strong> Auth (phone OTP), FCM push notifications,
+            and Firebase Storage for document uploads.
+            <br />
+            <br />
+            <strong className="text-green-400">Replace with custom backend for:</strong> All location updates, ride
+            matching, route calculations, order management, and real-time position streaming.
           </Callout>
         </section>
 
-        {/* Section 6: Cost Reduction Estimate */}
+        {/* ── Section 6: Cost Reduction ── */}
         <section id="s6" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">06</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Cost Reduction Estimate</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">06</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Cost Reduction Estimate
+            </h2>
             <SectionBadge text="Projected" variant="next" />
           </div>
 
           <div className="overflow-x-auto mb-6">
             <table className="w-full text-[13.5px] border-collapse">
               <thead>
-                <tr className="bg-surface/2">
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Optimization Action</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Affected Cost</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Estimated Reduction</th>
+                <tr className="bg-card">
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Optimization Action</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Affected Cost</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Estimated Reduction</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/80 font-semibold">
-                    <CheckCircle2 className="h-4 w-4 text-[#4fd490] inline mr-2" />
-                    Fix distanceFilter 1→8m + stop duplicate location stack
-                  </td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Firestore writes, downstream Directions calls</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~40–50%</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/80 font-semibold">
-                    <CheckCircle2 className="h-4 w-4 text-[#4fd490] inline mr-2" />
-                    Fix zombie listeners + store & cancel subscriptions
-                  </td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Firestore reads, Directions API calls per trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~15–25%</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/80 font-semibold">
-                    <CheckCircle2 className="h-4 w-4 text-[#4fd490] inline mr-2" />
-                    Polyline trimming instead of Directions recalculation
-                  </td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Directions API calls during trip</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~70–85% of in-trip calls</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/80 font-semibold">
-                    <CheckCircle2 className="h-4 w-4 text-[#4fd490] inline mr-2" />
-                    Debounce autocomplete + cache nearby places
-                  </td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Places Autocomplete + Nearby Search calls</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~60–80%</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Move route calculation to backend with Redis cache</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">All Directions API calls (shared cache)</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~50–70% additional</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Replace Firestore location tracking with WebSocket</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Firestore reads + writes (largest Firebase cost)</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">~85–95%</td>
-                </tr>
-                <tr className="bg-ok/6 border-l-2 border-ok">
-                  <td className="p-3 font-bold text-[#4fd490]">Total (full implementation)</td>
-                  <td className="p-3 font-bold text-[#4fd490]">Google Maps APIs + Firebase</td>
-                  <td className="p-3 font-bold text-[#4fd490]">60–75% overall reduction</td>
+                {[
+                  { done: true, action: "Fix distanceFilter 1→8m + stop duplicate location stack", cost: "Firestore writes, downstream Directions calls", reduction: "~40–50%" },
+                  { done: true, action: "Fix zombie listeners + store & cancel subscriptions", cost: "Firestore reads, Directions API calls per trip", reduction: "~15–25%" },
+                  { done: true, action: "Polyline trimming instead of Directions recalculation", cost: "Directions API calls during trip", reduction: "~70–85% of in-trip calls" },
+                  { done: true, action: "Debounce autocomplete + cache nearby places", cost: "Places Autocomplete + Nearby Search calls", reduction: "~60–80%" },
+                  { done: false, action: "Move route calculation to backend with Redis cache", cost: "All Directions API calls (shared cache)", reduction: "~50–70% additional" },
+                  { done: false, action: "Replace Firestore location tracking with WebSocket", cost: "Firestore reads + writes (largest Firebase cost)", reduction: "~85–95%" },
+                ].map(({ done, action, cost, reduction }) => (
+                  <tr key={action} className="hover:bg-card">
+                    <td className="p-3 border-b border-border text-foreground font-medium">
+                      {done && <CheckCircle2 className="h-4 w-4 text-green-400 inline mr-2" />}
+                      {action}
+                    </td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{cost}</td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{reduction}</td>
+                  </tr>
+                ))}
+                <tr className="bg-green-500/5 border-l-2 border-green-500">
+                  <td className="p-3 font-bold text-green-400">Total (full implementation)</td>
+                  <td className="p-3 font-bold text-green-400">Google Maps APIs + Firebase</td>
+                  <td className="p-3 font-bold text-green-400">60–75% overall reduction</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <Callout variant="done">
-            <strong className="text-[#7dd4a8]">Phase 1 quick wins (already implemented):</strong> Fixing distanceFilter, zombie listeners, polyline trimming, and debouncing reduced API costs by approximately <strong className="text-surface/85">45–55%</strong> with changes only to Flutter code — no new infrastructure required.
+            <strong className="text-green-400">Phase 1 quick wins (already implemented):</strong> Fixing distanceFilter,
+            zombie listeners, polyline trimming, and debouncing reduced API costs by approximately{" "}
+            <strong className="text-foreground">45–55%</strong> with changes only to Flutter code — no new
+            infrastructure required.
           </Callout>
         </section>
 
-        {/* Section 7: Recommended Backend Stack */}
+        {/* ── Section 7: Backend Stack ── */}
         <section id="s7" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">07</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Recommended Backend Stack</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">07</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Recommended Backend Stack
+            </h2>
             <SectionBadge text="Phase 2-3" variant="next" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <StackCard 
+            <StackCard
               tech="NestJS (Node.js)"
-              description={<>TypeScript-first, modular architecture with dependency injection. Ideal for domain-driven ride-hailing services (RideModule, DriverModule, RouteModule). Built-in WebSocket gateway via Socket.io adapter.</>}
+              description="TypeScript-first, modular architecture with dependency injection. Ideal for domain-driven ride-hailing services (RideModule, DriverModule, RouteModule). Built-in WebSocket gateway via Socket.io adapter."
             />
-            <StackCard 
+            <StackCard
               tech="PostgreSQL + PostGIS"
-              description={<><code className="font-mono text-xs text-gold2">ST_DWithin()</code> replaces all geoflutterfire-based driver-finding logic. Full ACID compliance for order lifecycle. Far cheaper at scale than Firestore per-read pricing.</>}
+              description={<><code className="font-mono text-xs text-primary">ST_DWithin()</code> replaces all geoflutterfire-based driver-finding logic. Full ACID compliance for order lifecycle. Far cheaper at scale than Firestore per-read pricing.</>}
             />
-            <StackCard 
+            <StackCard
               tech="Redis"
               description="Cache Google API responses — polylines, ETAs, place results — with TTL. Pub/Sub channel for driver location broadcast. Eliminates Firestore as the location pipe entirely."
             />
-            <StackCard 
+            <StackCard
               tech="Socket.io (WebSocket)"
               description="Replace Firestore real-time listeners. Driver emits position every 5 seconds → server broadcasts to customer's room. No per-message database write; horizontal scalability via Redis adapter."
             />
-            <StackCard 
+            <StackCard
               tech="Bull / BullMQ (Job Queue)"
               description="Queue for: route pre-computation, notifications, trip receipt processing, and fare calculation. Decouples latency-sensitive APIs from background work. Retries on Google API failures."
             />
-            <StackCard 
+            <StackCard
               tech="Google Maps Platform (via backend only)"
-              description={<>Called exclusively from the Route Service. <code className="font-mono text-xs text-gold2">RouteCache</code> module: key = SHA256(origin+destination), TTL = 24h. Use Maps Routes API v2 (cheaper than legacy Directions API).</>}
+              description={<>Called exclusively from the Route Service. <code className="font-mono text-xs text-primary">RouteCache</code> module: key = SHA256(origin+destination), TTL = 24h. Use Maps Routes API v2 (cheaper than legacy Directions API).</>}
             />
           </div>
 
           <CodeBlock className="mt-6">
             {"src/\n"}
-            {"├── "}<span className="text-[#78b8dc]">modules</span>{"/ \n"}
-            {"│   ├── "}<span className="text-[#e8a030]">rides</span>{"/          "}<span className="text-[#4a5e48]"># Order lifecycle (create, accept, complete)</span>{"\n"}
-            {"│   ├── "}<span className="text-[#e8a030]">drivers</span>{"/        "}<span className="text-[#4a5e48]"># Driver state, location, matching</span>{"\n"}
-            {"│   ├── "}<span className="text-[#e8a030]">routes</span>{"/         "}<span className="text-[#4a5e48]"># Route calculation + Redis cache layer</span>{"\n"}
-            {"│   ├── "}<span className="text-[#e8a030]">location</span>{"/       "}<span className="text-[#4a5e48]"># WebSocket gateway + Redis pub/sub</span>{"\n"}
-            {"│   ├── "}<span className="text-[#e8a030]">places</span>{"/         "}<span className="text-[#4a5e48]"># Autocomplete + nearby, cached</span>{"\n"}
-            {"│   └── "}<span className="text-[#e8a030]">notifications</span>{"/ "}<span className="text-[#4a5e48]"># FCM wrapper</span>{"\n"}
-            {"├── "}<span className="text-[#78b8dc]">common</span>{"/ \n"}
-            {"│   ├── "}<span className="text-[#e8a030]">guards</span>{"/         "}<span className="text-[#4a5e48]"># Firebase Auth token verification</span>{"\n"}
-            {"│   ├── "}<span className="text-[#e8a030]">interceptors</span>{"/   "}<span className="text-[#4a5e48]"># Logging, error normalization</span>{"\n"}
-            {"│   └── "}<span className="text-[#e8a030]">pipes</span>{"/          "}<span className="text-[#4a5e48]"># Validation</span>{"\n"}
-            {"└── "}<span className="text-[#78b8dc]">infra</span>{"/ \n"}
-            {"    ├── "}<span className="text-[#e8a030]">redis</span>{"/          "}<span className="text-[#4a5e48]"># Redis module (cache + pub/sub)</span>{"\n"}
-            {"    └── "}<span className="text-[#e8a030]">maps</span>{"/           "}<span className="text-[#4a5e48]"># Google Maps SDK wrapper + caching</span>
+            {"├── modules/\n"}
+            {"│   ├── rides/          # Order lifecycle (create, accept, complete)\n"}
+            {"│   ├── drivers/        # Driver state, location, matching\n"}
+            {"│   ├── routes/         # Route calculation + Redis cache layer\n"}
+            {"│   ├── location/       # WebSocket gateway + Redis pub/sub\n"}
+            {"│   ├── places/         # Autocomplete + nearby, cached\n"}
+            {"│   └── notifications/  # FCM wrapper\n"}
+            {"├── common/\n"}
+            {"│   ├── guards/         # Firebase Auth token verification\n"}
+            {"│   ├── interceptors/   # Logging, error normalization\n"}
+            {"│   └── pipes/          # Validation\n"}
+            {"└── infra/\n"}
+            {"    ├── redis/          # Redis module (cache + pub/sub)\n"}
+            {"    └── maps/           # Google Maps SDK wrapper + caching"}
           </CodeBlock>
         </section>
 
-        {/* Section 8: Implementation & Migration Plan */}
+        {/* ── Section 8: Migration Plan ── */}
         <section id="s8" className="mb-16">
-          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border-light">
-            <span className="font-mono text-[10px] text-gold tracking-wider">08</span>
-            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-surface">Implementation & Migration Plan</h2>
+          <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
+            <span className="font-mono text-[10px] text-primary tracking-wider">08</span>
+            <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
+              Implementation & Migration Plan
+            </h2>
             <SectionBadge text="Active" variant="next" />
           </div>
 
           {/* Phase 1 */}
-          <div className="border-l-2 border-ember pl-6 mb-8">
-            <div className="font-mono text-[9px] tracking-widest uppercase text-ember mb-1">Phase 1 - Weeks 1–2 - Flutter Only - Complete</div>
-            <h4 className="font-serif text-lg font-bold text-surface/85 mb-3">Quick Wins — 45–55% cost reduction achieved</h4>
+          <div className="border-l-2 border-destructive pl-6 mb-8">
+            <div className="font-mono text-[9px] tracking-widest uppercase text-destructive mb-1">
+              Phase 1 — Weeks 1–2 — Flutter Only — Complete
+            </div>
+            <h4 className="font-serif text-lg font-bold text-foreground mb-3">
+              Quick Wins — 45–55% cost reduction achieved
+            </h4>
             <Callout variant="done">
-              All seven Phase 1 steps have been completed and deployed to production. See Section 03 for the full breakdown of what was implemented and the validation process.
+              All seven Phase 1 steps have been completed and deployed to production. See Section 03 for the full
+              breakdown of what was implemented and the validation process.
             </Callout>
           </div>
 
           {/* Phase 2 */}
-          <div className="border-l-2 border-gold pl-6 mb-8">
-            <div className="font-mono text-[9px] tracking-widest uppercase text-gold mb-1">Phase 2 - Weeks 3–8 - Backend API Layer</div>
-            <h4 className="font-serif text-lg font-bold text-surface/85 mb-3">Centralise all Google API calls — ~60–65% total reduction</h4>
-            <ol className="space-y-2 text-[13.5px] text-surface/55 list-decimal list-inside leading-relaxed">
+          <div className="border-l-2 border-primary pl-6 mb-8">
+            <div className="font-mono text-[9px] tracking-widest uppercase text-primary mb-1">
+              Phase 2 — Weeks 3–8 — Backend API Layer
+            </div>
+            <h4 className="font-serif text-lg font-bold text-foreground mb-3">
+              Centralise all Google API calls — ~60–65% total reduction
+            </h4>
+            <ol className="space-y-2 text-[13.5px] text-muted-foreground list-decimal list-inside leading-relaxed">
               <li>Stand up NestJS backend with PostgreSQL + PostGIS and Redis.</li>
-              <li>Implement <code className="font-mono text-xs text-gold2">RoutesModule</code> — proxy for Directions API with Redis cache (TTL 24h per origin/destination pair).</li>
-              <li>Implement <code className="font-mono text-xs text-gold2">PlacesModule</code> — proxy for Autocomplete and Nearby Search with per-query Redis cache (TTL 15min).</li>
+              <li>Implement <code className="font-mono text-xs text-primary">RoutesModule</code> — proxy for Directions API with Redis cache (TTL 24h per origin/destination pair).</li>
+              <li>Implement <code className="font-mono text-xs text-primary">PlacesModule</code> — proxy for Autocomplete and Nearby Search with per-query Redis cache (TTL 15min).</li>
               <li>Update Flutter apps to call your backend route/places endpoints instead of Google APIs directly.</li>
-              <li>Implement <code className="font-mono text-xs text-gold2">LocationModule</code> with Socket.io WebSocket gateway.</li>
+              <li>Implement <code className="font-mono text-xs text-primary">LocationModule</code> with Socket.io WebSocket gateway.</li>
               <li>Migrate order status updates from Firestore to WebSocket events.</li>
             </ol>
             <Callout>
-              <strong className="text-surface/85">Risk:</strong> Medium. Keep Firebase Firestore as fallback for order status for 2 weeks during transition. A/B rollout: 10% of new rides use new backend, 90% continue on Firebase.
+              <strong className="text-foreground">Risk:</strong> Medium. Keep Firebase Firestore as fallback for order
+              status for 2 weeks during transition. A/B rollout: 10% of new rides use new backend, 90% continue on
+              Firebase.
             </Callout>
           </div>
 
           {/* Phase 3 */}
-          <div className="border-l-2 border-ok pl-6 mb-8">
-            <div className="font-mono text-[9px] tracking-widest uppercase text-[#4fd490] mb-1">Phase 3 - Weeks 9–16 - Full Architecture Migration</div>
-            <h4 className="font-serif text-lg font-bold text-surface/85 mb-3">Complete Firebase replacement for operational data — ~70–75% total reduction</h4>
-            <ol className="space-y-2 text-[13.5px] text-surface/55 list-decimal list-inside leading-relaxed">
+          <div className="border-l-2 border-green-500 pl-6 mb-8">
+            <div className="font-mono text-[9px] tracking-widest uppercase text-green-400 mb-1">
+              Phase 3 — Weeks 9–16 — Full Architecture Migration
+            </div>
+            <h4 className="font-serif text-lg font-bold text-foreground mb-3">
+              Complete Firebase replacement for operational data — ~70–75% total reduction
+            </h4>
+            <ol className="space-y-2 text-[13.5px] text-muted-foreground list-decimal list-inside leading-relaxed">
               <li>Migrate order and trip data from Firestore to PostgreSQL with migration script.</li>
-              <li>Implement driver matching via PostGIS <code className="font-mono text-xs text-gold2">ST_DWithin()</code>. Remove all geoflutterfire queries.</li>
+              <li>Implement driver matching via PostGIS <code className="font-mono text-xs text-primary">ST_DWithin()</code>. Remove all geoflutterfire queries.</li>
               <li>Implement BullMQ job queue for: trip fare calculation, receipt generation, payout processing.</li>
               <li>Keep Firebase Auth (phone OTP) + FCM + Storage — these remain cost-effective.</li>
               <li>Decommission Firestore collections: orders, driver_users location fields.</li>
               <li>Implement monitoring: Prometheus + Grafana dashboard.</li>
             </ol>
             <Callout>
-              <strong className="text-surface/85">Risk:</strong> Medium-High. Run parallel writes (PostgreSQL + Firestore) for 4 weeks before cutting over reads. Maintain rollback scripts.
+              <strong className="text-foreground">Risk:</strong> Medium-High. Run parallel writes (PostgreSQL + Firestore)
+              for 4 weeks before cutting over reads. Maintain rollback scripts.
             </Callout>
           </div>
 
-          <h3 className="font-mono text-[11px] tracking-wider uppercase text-surface/75 mb-4 mt-8">Risk Register</h3>
+          <h3 className="font-mono text-[11px] tracking-wider uppercase text-foreground/75 mb-4 mt-8">
+            Risk Register
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-[13.5px] border-collapse">
               <thead>
-                <tr className="bg-surface/2">
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Risk</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Probability</th>
-                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-surface/30 p-3 border-b border-border-light">Mitigation</th>
+                <tr className="bg-card">
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Risk</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Probability</th>
+                  <th className="text-left font-mono text-[9.5px] uppercase tracking-wider text-muted-foreground p-3 border-b border-border">Mitigation</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Location accuracy degradation with higher distanceFilter</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Low</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Validated in Phase 1 staging. Filter of 5–8m is imperceptible to users.</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">WebSocket reconnection on mobile network switching</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Medium</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Implement exponential backoff reconnect in Flutter.</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 border-b border-border-light text-surface/55">Redis cache stale routes (road closures)</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Low</td>
-                  <td className="p-3 border-b border-border-light text-surface/55">Use short TTL (2h) for high-traffic corridors. Driver deviation triggers cache invalidation.</td>
-                </tr>
-                <tr className="hover:bg-surface/2">
-                  <td className="p-3 text-surface/55">Increased backend infrastructure cost</td>
-                  <td className="p-3 text-surface/55">Low-Medium</td>
-                  <td className="p-3 text-surface/55">NestJS + PostgreSQL + Redis on a $40/month VPS handles thousands of concurrent rides.</td>
-                </tr>
+                {[
+                  ["Location accuracy degradation with higher distanceFilter", "Low", "Validated in Phase 1 staging. Filter of 5–8m is imperceptible to users."],
+                  ["WebSocket reconnection on mobile network switching", "Medium", "Implement exponential backoff reconnect in Flutter."],
+                  ["Redis cache stale routes (road closures)", "Low", "Use short TTL (2h) for high-traffic corridors. Driver deviation triggers cache invalidation."],
+                  ["Increased backend infrastructure cost", "Low–Medium", "NestJS + PostgreSQL + Redis on a $40/month VPS handles thousands of concurrent rides."],
+                ].map(([risk, prob, mitigation]) => (
+                  <tr key={risk as string} className="hover:bg-card">
+                    <td className="p-3 border-b border-border text-muted-foreground">{risk}</td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{prob}</td>
+                    <td className="p-3 border-b border-border text-muted-foreground">{mitigation}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </section>
 
         {/* Divider */}
-        <hr className="border-0 border-t border-border-light my-14" />
+        <hr className="border-0 border-t border-border my-14" />
 
         {/* Footer */}
-        <footer className="text-center py-8">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <div className="w-6 h-6 bg-gold rounded-md flex items-center justify-center font-serif text-xs font-black text-void">O</div>
-            <span className="font-mono text-[10px] tracking-wider uppercase text-surface/20">
-              <strong className="text-gold">Optin</strong>.co.tz
-            </span>
+        <footer className="border-t bg-background py-6 print:hidden">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
+            <p className="text-xs text-muted-foreground">
+              &copy; {new Date().getFullYear()} Optin Digital Solutions Ltd. All rights reserved.
+            </p>
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                Terms of Service
+              </a>
+              <a
+                href="https://optin.co.tz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+              >
+                Contact <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
-          <p className="text-[11.5px] text-surface/18 leading-relaxed max-w-md mx-auto">
-            Optin Digital Solutions Ltd - Dar es Salaam, Tanzania - optin.co.tz<br />
-            This report is confidential and prepared exclusively for Jamboride. Any reproduction or distribution without written consent is prohibited.<br /><br />
-            Technical Audit - April 2026 - Based on direct analysis of driver and customer Flutter source code.
-          </p>
         </footer>
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center pb-12 px-4">
-        <Button className="bg-gold hover:bg-gold2 text-void font-semibold">
-          <Download className="h-4 w-4 mr-2" />
+      {/* <div className="flex flex-col sm:flex-row gap-4 justify-center pb-12 px-4">
+        <Button className="gap-2 font-semibold">
+          <Download className="h-4 w-4" />
           Download PDF Report
         </Button>
-        <Button variant="outline" className="border-border-gold text-gold hover:bg-gold-dim">
-          <ExternalLink className="h-4 w-4 mr-2" />
+        <Button variant="outline" className="gap-2">
+          <ExternalLink className="h-4 w-4" />
           Share Report Link
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }
