@@ -51,19 +51,23 @@ const sections = [
   { id: "s8", title: "Migration Plan", icon: FileText, badge: "Active" },
 ]
 
+// ── Logo component ──────────────────────────────────────────────────────────
+// h-7 (28px) is the single source-of-truth size used everywhere.
+// Pass a custom className only when a specific context truly needs it.
 function OptinLogo({ className }: { className?: string }) {
   return (
     <Image
       src="/images/optin-logo.webp"
       alt="Optin Technology Limited"
-      width={140}
-      height={45}
-      className={className ?? "h-8 w-auto"}
+      width={120}
+      height={36}
+      className={className ?? "h-7 w-auto object-contain"}
       priority
     />
   )
 }
 
+// ── Sidebar ─────────────────────────────────────────────────────────────────
 function ReportSidebar({
   activeSection,
   onSectionClick,
@@ -73,19 +77,23 @@ function ReportSidebar({
 }) {
   return (
     <Sidebar variant="inset" collapsible="icon">
-      {/* ── Header ── */}
+
+      {/* Header */}
       <SidebarHeader className="h-16 border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-4 h-full">
-          {/* Logo mark — always visible */}
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden">
-            <OptinLogo className="h-12 w-auto" />
+          {/*
+            Logo sits in a fixed-height flex row that matches the header (h-16).
+            We let the image be h-7 so it breathes evenly top & bottom.
+          */}
+          <div className="flex items-center justify-center shrink-0">
+            <OptinLogo className="h-7 w-auto object-contain" />
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarSeparator />
 
-      {/* ── Nav ── */}
+      {/* Nav */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/50">
@@ -118,7 +126,7 @@ function ReportSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <SidebarFooter className="border-t border-sidebar-border">
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground group-data-[collapsible=icon]:justify-center">
           <Lock className="h-3 w-3 text-destructive shrink-0" />
@@ -134,6 +142,7 @@ function ReportSidebar({
   )
 }
 
+// ── Page ─────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [state, setState] = useState<AppState>("consent")
   const [email, setEmail] = useState("")
@@ -141,11 +150,13 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("s1")
   const mainRef = useRef<HTMLDivElement>(null)
 
-  // ── Auth check on mount ──
+  // Auth check on mount
   useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (user?.email) {
         setEmail(user.email)
         setState("report")
@@ -155,7 +166,7 @@ export default function Home() {
     checkAuth()
   }, [])
 
-  // ── Scroll spy: IntersectionObserver on the main scroll container ──
+  // Scroll spy
   useEffect(() => {
     if (state !== "report") return
 
@@ -166,7 +177,6 @@ export default function Home() {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Pick the topmost intersecting section
         const visible = entries
           .filter((e) => e.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
@@ -182,7 +192,6 @@ export default function Home() {
       }
     )
 
-    // Small delay to allow the report to fully render before observing
     const timer = setTimeout(() => {
       sectionIds.forEach((id) => {
         const el = document.getElementById(id)
@@ -196,7 +205,7 @@ export default function Home() {
     }
   }, [state])
 
-  // ── Handlers ──
+  // Handlers
   const handleEmailSubmit = async (submittedEmail: string) => {
     try {
       const response = await fetch("/api/auth/send-otp", {
@@ -259,7 +268,7 @@ export default function Home() {
     }
   }
 
-  // ── Loading ──
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -270,7 +279,7 @@ export default function Home() {
     )
   }
 
-  // ── Consent / OTP gate ──
+  // Consent / OTP gate
   if (state === "consent") {
     return (
       <ConsentForm
@@ -280,29 +289,37 @@ export default function Home() {
     )
   }
 
-  // ── Report view ──
+  // Report view
   return (
     <SidebarProvider defaultOpen={true}>
       <ReportSidebar activeSection={activeSection} onSectionClick={handleSectionClick} />
 
       <SidebarInset>
+
         {/* ── Top bar ── */}
         <header className="sticky top-0 z-50 flex h-16 items-center justify-between gap-4 border-b bg-background/95 backdrop-blur-xl px-4 lg:px-6 print:hidden">
-          {/* Left: trigger + branding */}
+
+          {/* Left: sidebar trigger + logo */}
           <div className="flex items-center gap-3 min-w-0">
             <SidebarTrigger className="text-muted-foreground hover:text-foreground shrink-0" />
-            <div className="h-4 w-px bg-border hidden sm:block shrink-0" />
 
-            <div className="hidden sm:flex items-center gap-2.5 min-w-0">
-              {/* Logo */}
-              <div className="h-12 w-12 rounded-md overflow-hidden shrink-0">
-                <OptinLogo className="h-12 w-auto" />
-              </div>
+            {/* Divider */}
+            <div className="h-5 w-px bg-border hidden sm:block shrink-0" />
+
+            {/*
+              Logo in the top bar.
+              Wrapped in a flex container so it aligns perfectly with the
+              other vertically-centered items in the h-16 bar.
+              h-7 (28px) = ~43% of 64px bar height — the optical sweet spot.
+            */}
+            <div className="hidden sm:flex items-center shrink-0">
+              <OptinLogo className="h-7 w-auto object-contain" />
             </div>
           </div>
 
-          {/* Right: CTAs */}
+          {/* Right: action buttons */}
           <div className="flex items-center gap-2 shrink-0">
+
             {/* Download PDF */}
             <Button
               variant="outline"
@@ -367,7 +384,7 @@ export default function Home() {
         >
           <AuditReport userEmail={email} onLogout={handleLogout} />
 
-          {/* ── Footer ── */}
+          {/* Footer */}
           <footer className="border-t bg-background py-6 print:hidden">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
               <p className="text-xs text-muted-foreground">
@@ -392,6 +409,7 @@ export default function Home() {
             </div>
           </footer>
         </main>
+
       </SidebarInset>
     </SidebarProvider>
   )
