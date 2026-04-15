@@ -147,7 +147,7 @@ export function ConsentForm({ onEmailSubmit, onOtpVerify }: ConsentFormProps) {
                       <Shield className="h-7 w-7 text-primary" />
                     </div>
                   </div>
-                  <CardTitle className="text-2xl">IT Infrastructure Audit</CardTitle>
+                  <CardTitle className="text-2xl">Technical Audit</CardTitle>
                   <CardDescription>Confidential Report — JamboRide</CardDescription>
                 </CardHeader>
 
