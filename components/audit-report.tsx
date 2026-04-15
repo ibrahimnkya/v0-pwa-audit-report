@@ -759,7 +759,7 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                   <li>Implement <code>LocationModule</code> with Socket.io WebSocket gateway. Driver app connects via WebSocket; broadcasts location every 5 seconds only when moving (&gt;5m).</li>
                   <li>Migrate order status updates from Firestore to WebSocket events.</li>
                 </ol>
-                <Callout variant="gold"><strong className="text-amber-400">Risk:</strong> Medium. Keep Firebase Firestore as fallback for order status for 2 weeks during transition. A/B rollout: 10% of new rides use new backend, 90% continue on Firebase.</Callout>
+                <Callout variant="gold"><strong className="text-amber-400">Risk:</strong> Medium. Keep Firebase Firestore as a fallback for order status for 2 weeks during transition. A/B rollout: 10% of new rides use new backend, 90% continue on Firebase.</Callout>
               </div>
 
               {/* Phase 3 */}
@@ -767,7 +767,7 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                 <p className="font-mono text-[9px] tracking-widest uppercase text-blue-400 mb-1">Phase 3 · Weeks 9–16 · Full Architecture Migration</p>
                 <p className="font-serif text-lg font-bold text-zinc-100 mb-3">Complete Firebase replacement for operational data — ~70–75% total reduction</p>
                 <ol className="space-y-2 text-sm text-zinc-400 list-decimal list-inside">
-                  <li>Migrate order and trip data from Firestore to PostgreSQL with migration script for historical orders.</li>
+                  <li>Migrate order and trip data from Firestore to PostgreSQL with a migration script for historical orders.</li>
                   <li>Implement driver matching via PostGIS <code>ST_DWithin()</code>. Remove all geoflutterfire queries.</li>
                   <li>Implement BullMQ job queue for: trip fare calculation, receipt generation, payout processing, and notification dispatching.</li>
                   <li>Keep Firebase Auth (phone OTP) + FCM + Storage — these remain cost-effective.</li>
@@ -828,9 +828,6 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
     </div>
   )
 }
-
-  X,
-} from "lucide-react"
 
 // ─── Data ───────────────────────────────────────────────────────────────────
 
