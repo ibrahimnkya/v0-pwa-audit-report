@@ -64,13 +64,13 @@ function ReportSidebar({
       {/* ── Header: logo + name ── */}
       <SidebarHeader className="h-16 px-4 flex flex-row items-center gap-3 border-b border-sidebar-border">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary flex-shrink-0 overflow-hidden">
-          <Image
-            src="/images/optin-logo.webp"
-            alt="Optin"
-            width={32}
-            height={32}
-            className="h-8 w-8 object-cover"
-          />
+         <Image
+                  src="/images/optin-logo.webp"
+                  alt="Optin Technology Limited"
+                  width={140}
+                  height={45}
+                  className="h-10 w-auto opacity-80"
+                />
         </div>
         <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden min-w-0">
           <span className="font-mono text-[11px] font-semibold tracking-wide text-foreground truncate">
@@ -311,10 +311,10 @@ export default function Home() {
               <div className="h-7 w-7 rounded-md overflow-hidden flex-shrink-0">
                 <Image
                   src="/images/optin-logo.webp"
-                  alt="Optin"
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 object-cover"
+                  alt="Optin Technology Limited"
+                  width={140}
+                  height={45}
+                  className="h-10 w-auto opacity-80"
                 />
               </div>
               <span className="font-mono text-xs tracking-wide text-muted-foreground truncate">
