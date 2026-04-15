@@ -12,12 +12,12 @@ import {
 import {
   CheckCircle2,
   AlertTriangle,
-  ExternalLink,
   Check,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface AuditReportProps {
   userEmail?: string
@@ -47,7 +47,7 @@ const sections: Section[] = [
   { id: "s8", number: "08", title: "Implementation & Migration Plan", badge: { text: "Active", variant: "next" } },
 ]
 
-// ─── Shared micro-components ──────────────────────────────────────────────────
+// ─── Micro-components ─────────────────────────────────────────────────────────
 
 const badgeVariants = {
   critical: "bg-destructive/15 text-destructive border-destructive/25",
@@ -102,7 +102,7 @@ function Callout({
 function StepDone({ title, description }: { title: React.ReactNode; description: string }) {
   return (
     <div className="flex gap-4 py-4 border-b border-border last:border-b-0">
-      <div className="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div className="w-6 h-6 rounded-full bg-green-500/20 border border-green-500/40 flex items-center justify-center shrink-0 mt-0.5">
         <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
       </div>
       <div className="flex-1">
@@ -160,9 +160,64 @@ function StackCard({ tech, description }: { tech: string; description: React.Rea
   )
 }
 
+// ─── Print styles injected via a style tag ────────────────────────────────────
+// These only apply when the user triggers window.print() from the top bar.
+const PrintStyles = () => (
+  <style>{`
+    @media print {
+      /* Hide nav chrome */
+      header, aside, [data-sidebar], .print\\:hidden { display: none !important; }
+
+      /* Full-bleed white background */
+      body, html { background: white !important; }
+
+      /* Expand main to full width */
+      main, [data-sidebar-inset] { margin: 0 !important; padding: 0 !important; width: 100% !important; height: auto !important; overflow: visible !important; }
+
+      /* Report content */
+      .audit-report-root { max-width: 100% !important; }
+
+      /* Page numbers + document title in footer */
+      @page {
+        margin: 20mm 16mm 24mm;
+      }
+      @page :first {
+        margin-top: 10mm;
+      }
+
+      /* Running footer: document title left, page number right */
+      .print-page-footer {
+        display: block !important;
+        position: running(footer);
+      }
+      @page {
+        @bottom-left {
+          content: "Jamboride Architecture & Cost Optimization Audit — Optin Digital Solutions Ltd";
+          font-family: monospace;
+          font-size: 8pt;
+          color: #888;
+        }
+        @bottom-right {
+          content: "Page " counter(page) " of " counter(pages);
+          font-family: monospace;
+          font-size: 8pt;
+          color: #888;
+        }
+      }
+
+      /* Page breaks */
+      section { page-break-inside: avoid; break-inside: avoid; }
+      h2, h3 { page-break-after: avoid; break-after: avoid; }
+
+      /* Accordion — force open for print */
+      [data-state="closed"] > div[role="region"] { display: block !important; visibility: visible !important; height: auto !important; }
+    }
+  `}</style>
+)
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 
-export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
+export function AuditReport({ userEmail }: AuditReportProps) {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId)
     if (element) {
@@ -171,8 +226,25 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
   }
 
   return (
-    <div className="w-full">
-      {/* Hero Section */}
+    <div className="w-full audit-report-root">
+      <PrintStyles />
+
+      {/* ── Print-only cover header ── */}
+      <div className="hidden print:flex items-center justify-between px-10 py-6 border-b border-border">
+        <Image
+          src="/images/optin-logo.webp"
+          alt="Optin Technology Limited"
+          width={140}
+          height={45}
+          className="h-10 w-auto"
+        />
+        <div className="text-right font-mono text-[10px] text-muted-foreground uppercase tracking-widest">
+          <div>Confidential</div>
+          <div>April 2026</div>
+        </div>
+      </div>
+
+      {/* ── Hero ── */}
       <section className="relative py-20 px-10 max-w-[900px] mx-auto">
         <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-widest uppercase text-primary mb-6">
           <span>Technical Audit Report — April 2026</span>
@@ -189,7 +261,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           Flutter — Firebase — Google Maps / Directions APIs
         </p>
 
-        {/* Meta Grid */}
+        {/* Meta grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 border border-border rounded-[14px] overflow-hidden bg-card">
           <div className="p-5 border-r border-border">
             <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/60 block mb-1.5">Scope</label>
@@ -210,7 +282,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </div>
       </section>
 
-      {/* Stat Strip */}
+      {/* ── Stat strip ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 bg-primary">
         <div className="p-5 sm:p-6 border-r border-black/12 text-primary-foreground">
           <div className="font-serif text-3xl sm:text-4xl font-black leading-none tracking-tight">8</div>
@@ -230,8 +302,9 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </div>
       </div>
 
-      {/* Body Content */}
+      {/* ── Body ── */}
       <div className="max-w-[900px] mx-auto px-10 py-16">
+
         {/* Table of Contents */}
         <Card className="bg-card border-border rounded-[14px] mb-14">
           <CardContent className="p-7">
@@ -253,7 +326,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </CardContent>
         </Card>
 
-        {/* ── Section 1: Root Cause Analysis ── */}
+        {/* ── Section 1 ── */}
         <section id="s1" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">01</span>
@@ -265,17 +338,11 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
 
           <p className="text-[14.5px] text-muted-foreground leading-relaxed mb-6">
             After a full read of both codebases — specifically{" "}
-            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
-              home_controller.dart
-            </code>
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">home_controller.dart</code>
             ,{" "}
-            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
-              live_tracking_controller.dart
-            </code>
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">live_tracking_controller.dart</code>
             ,{" "}
-            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">
-              fire_store_utils.dart
-            </code>
+            <code className="font-mono text-xs bg-muted border border-border rounded px-1.5 py-0.5 text-primary">fire_store_utils.dart</code>
             , and all controller classes — the following systemic issues were identified as driving the majority of API cost.
           </p>
 
@@ -283,7 +350,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-1" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 1 — distanceFilter: 1 Meter (Most Expensive Single Line)
                   </span>
@@ -315,7 +382,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-2" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 2 — Directions API Called on Every Firebase Snapshot
                   </span>
@@ -326,9 +393,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
                   <strong className="text-foreground">Critical.</strong> Both{" "}
                   <code className="font-mono text-xs text-primary">LiveTrackingController.getPolyline()</code> (customer)
                   and the driver&apos;s equivalent call{" "}
-                  <code className="font-mono text-xs text-primary">
-                    polylinePoints.getRouteBetweenCoordinates()
-                  </code>{" "}
+                  <code className="font-mono text-xs text-primary">polylinePoints.getRouteBetweenCoordinates()</code>{" "}
                   — which hits the Google Directions API — <em>inside a Firestore snapshot listener</em>. The driver
                   document is updated continuously (see Issue 1), so every location write causes both apps to
                   independently call the Directions API.
@@ -345,7 +410,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-3" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 3 — shouldReRoute Threshold of 20 Meters is Too Aggressive
                   </span>
@@ -364,7 +429,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-4" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 4 — Duplicate Location Tracking Stack
                   </span>
@@ -384,7 +449,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-5" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-destructive flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-destructive shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 5 — Nested Firestore Listeners (Memory Leaks)
                   </span>
@@ -413,7 +478,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-6" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 6 — Places Autocomplete + Distance Matrix on Every Keystroke
                   </span>
@@ -431,7 +496,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-7" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 7 — Nearby Places API Called on Every App Open
                   </span>
@@ -450,7 +515,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             <AccordionItem value="issue-8" className="border border-border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline py-4">
                 <div className="flex items-center gap-3 text-left">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0" />
+                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
                   <span className="font-medium text-foreground text-sm">
                     Issue 8 — Background Location Mode Always Enabled
                   </span>
@@ -468,7 +533,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </Accordion>
         </section>
 
-        {/* ── Section 2: Code & Architecture Weaknesses ── */}
+        {/* ── Section 2 ── */}
         <section id="s2" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">02</span>
@@ -542,7 +607,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </div>
         </section>
 
-        {/* ── Section 3: Steps Taken ── */}
+        {/* ── Section 3 ── */}
         <section id="s3" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">03</span>
@@ -597,7 +662,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </Callout>
         </section>
 
-        {/* ── Section 4: Architecture Proposal ── */}
+        {/* ── Section 4 ── */}
         <section id="s4" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">04</span>
@@ -618,38 +683,20 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </h3>
           <ul className="space-y-3 text-[13.5px] text-muted-foreground leading-relaxed pl-5">
             {[
-              [
-                "Mobile → Your Backend only.",
-                "Apps never call google.com directly. All Maps/Directions/Places calls are proxied through your backend.",
-              ],
-              [
-                "Backend → Redis cache → Google APIs.",
-                "Every route, ETA, and place result is cached in Redis. Repeated requests return cached data.",
-              ],
-              [
-                "Location via WebSocket, not Firestore polling.",
-                "Driver location updates are broadcast over WebSocket. No Firestore document write per update; no downstream read cascade.",
-              ],
-              [
-                "Route calculated once per order.",
-                "At order acceptance, the Route Service computes and stores the full polyline — trimmed client-side during the trip.",
-              ],
-              [
-                "Dispatch uses PostGIS geospatial queries.",
-                "Finding nearby drivers uses a PostgreSQL + PostGIS radius query — not Firestore geohash queries.",
-              ],
+              ["Mobile → Your Backend only.", "Apps never call google.com directly. All Maps/Directions/Places calls are proxied through your backend."],
+              ["Backend → Redis cache → Google APIs.", "Every route, ETA, and place result is cached in Redis. Repeated requests return cached data."],
+              ["Location via WebSocket, not Firestore polling.", "Driver location updates are broadcast over WebSocket. No Firestore document write per update; no downstream read cascade."],
+              ["Route calculated once per order.", "At order acceptance, the Route Service computes and stores the full polyline — trimmed client-side during the trip."],
+              ["Dispatch uses PostGIS geospatial queries.", "Finding nearby drivers uses a PostgreSQL + PostGIS radius query — not Firestore geohash queries."],
             ].map(([bold, rest]) => (
-              <li
-                key={bold as string}
-                className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-primary/50"
-              >
+              <li key={bold as string} className="relative before:content-[''] before:absolute before:left-[-15px] before:top-[0.6em] before:w-1.5 before:h-1.5 before:rounded-full before:bg-primary/50">
                 <strong className="text-foreground">{bold}</strong> {rest}
               </li>
             ))}
           </ul>
         </section>
 
-        {/* ── Section 5: Firebase Evaluation ── */}
+        {/* ── Section 5 ── */}
         <section id="s5" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">05</span>
@@ -667,7 +714,13 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
                   <span className="text-[13px] font-semibold text-foreground">Where Firebase works well</span>
                 </div>
                 <ul className="space-y-2 text-[13.5px] text-muted-foreground">
-                  {["Real-time order status updates (Firestore listeners)", "Firebase Auth — battle-tested, phone number OTP works well", "Firebase Storage — driver document uploads", "FCM push notifications — reliable, cross-platform", "Fast initial deployment — no backend infra to manage"].map((item) => (
+                  {[
+                    "Real-time order status updates (Firestore listeners)",
+                    "Firebase Auth — battle-tested, phone number OTP works well",
+                    "Firebase Storage — driver document uploads",
+                    "FCM push notifications — reliable, cross-platform",
+                    "Fast initial deployment — no backend infra to manage",
+                  ].map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -681,7 +734,13 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
                   <span className="text-[13px] font-semibold text-foreground">Where Firebase is hurting you</span>
                 </div>
                 <ul className="space-y-2 text-[13.5px] text-muted-foreground">
-                  {["Firestore pricing is per read/write — architecture writes thousands per ride", "No server-side logic — business rules embedded in mobile apps", "No native geospatial queries (geoflutterfire is a workaround)", "Vendor lock-in — hard to migrate once data is in Firestore", "Real-time listeners at scale create connection storm"].map((item) => (
+                  {[
+                    "Firestore pricing is per read/write — architecture writes thousands per ride",
+                    "No server-side logic — business rules embedded in mobile apps",
+                    "No native geospatial queries (geoflutterfire is a workaround)",
+                    "Vendor lock-in — hard to migrate once data is in Firestore",
+                    "Real-time listeners at scale create connection storm",
+                  ].map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
@@ -695,14 +754,13 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           <Callout variant="done">
             <strong className="text-green-400">Keep Firebase for:</strong> Auth (phone OTP), FCM push notifications,
             and Firebase Storage for document uploads.
-            <br />
-            <br />
+            <br /><br />
             <strong className="text-green-400">Replace with custom backend for:</strong> All location updates, ride
             matching, route calculations, order management, and real-time position streaming.
           </Callout>
         </section>
 
-        {/* ── Section 6: Cost Reduction ── */}
+        {/* ── Section 6 ── */}
         <section id="s6" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">06</span>
@@ -723,10 +781,10 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
               </thead>
               <tbody>
                 {[
-                  { done: true, action: "Fix distanceFilter 1→8m + stop duplicate location stack", cost: "Firestore writes, downstream Directions calls", reduction: "~40–50%" },
-                  { done: true, action: "Fix zombie listeners + store & cancel subscriptions", cost: "Firestore reads, Directions API calls per trip", reduction: "~15–25%" },
-                  { done: true, action: "Polyline trimming instead of Directions recalculation", cost: "Directions API calls during trip", reduction: "~70–85% of in-trip calls" },
-                  { done: true, action: "Debounce autocomplete + cache nearby places", cost: "Places Autocomplete + Nearby Search calls", reduction: "~60–80%" },
+                  { done: true,  action: "Fix distanceFilter 1→8m + stop duplicate location stack", cost: "Firestore writes, downstream Directions calls", reduction: "~40–50%" },
+                  { done: true,  action: "Fix zombie listeners + store & cancel subscriptions", cost: "Firestore reads, Directions API calls per trip", reduction: "~15–25%" },
+                  { done: true,  action: "Polyline trimming instead of Directions recalculation", cost: "Directions API calls during trip", reduction: "~70–85% of in-trip calls" },
+                  { done: true,  action: "Debounce autocomplete + cache nearby places", cost: "Places Autocomplete + Nearby Search calls", reduction: "~60–80%" },
                   { done: false, action: "Move route calculation to backend with Redis cache", cost: "All Directions API calls (shared cache)", reduction: "~50–70% additional" },
                   { done: false, action: "Replace Firestore location tracking with WebSocket", cost: "Firestore reads + writes (largest Firebase cost)", reduction: "~85–95%" },
                 ].map(({ done, action, cost, reduction }) => (
@@ -756,7 +814,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </Callout>
         </section>
 
-        {/* ── Section 7: Backend Stack ── */}
+        {/* ── Section 7 ── */}
         <section id="s7" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">07</span>
@@ -767,30 +825,12 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <StackCard
-              tech="NestJS (Node.js)"
-              description="TypeScript-first, modular architecture with dependency injection. Ideal for domain-driven ride-hailing services (RideModule, DriverModule, RouteModule). Built-in WebSocket gateway via Socket.io adapter."
-            />
-            <StackCard
-              tech="PostgreSQL + PostGIS"
-              description={<><code className="font-mono text-xs text-primary">ST_DWithin()</code> replaces all geoflutterfire-based driver-finding logic. Full ACID compliance for order lifecycle. Far cheaper at scale than Firestore per-read pricing.</>}
-            />
-            <StackCard
-              tech="Redis"
-              description="Cache Google API responses — polylines, ETAs, place results — with TTL. Pub/Sub channel for driver location broadcast. Eliminates Firestore as the location pipe entirely."
-            />
-            <StackCard
-              tech="Socket.io (WebSocket)"
-              description="Replace Firestore real-time listeners. Driver emits position every 5 seconds → server broadcasts to customer's room. No per-message database write; horizontal scalability via Redis adapter."
-            />
-            <StackCard
-              tech="Bull / BullMQ (Job Queue)"
-              description="Queue for: route pre-computation, notifications, trip receipt processing, and fare calculation. Decouples latency-sensitive APIs from background work. Retries on Google API failures."
-            />
-            <StackCard
-              tech="Google Maps Platform (via backend only)"
-              description={<>Called exclusively from the Route Service. <code className="font-mono text-xs text-primary">RouteCache</code> module: key = SHA256(origin+destination), TTL = 24h. Use Maps Routes API v2 (cheaper than legacy Directions API).</>}
-            />
+            <StackCard tech="NestJS (Node.js)" description="TypeScript-first, modular architecture with dependency injection. Ideal for domain-driven ride-hailing services (RideModule, DriverModule, RouteModule). Built-in WebSocket gateway via Socket.io adapter." />
+            <StackCard tech="PostgreSQL + PostGIS" description={<><code className="font-mono text-xs text-primary">ST_DWithin()</code> replaces all geoflutterfire-based driver-finding logic. Full ACID compliance for order lifecycle. Far cheaper at scale than Firestore per-read pricing.</>} />
+            <StackCard tech="Redis" description="Cache Google API responses — polylines, ETAs, place results — with TTL. Pub/Sub channel for driver location broadcast. Eliminates Firestore as the location pipe entirely." />
+            <StackCard tech="Socket.io (WebSocket)" description="Replace Firestore real-time listeners. Driver emits position every 5 seconds → server broadcasts to customer's room. No per-message database write; horizontal scalability via Redis adapter." />
+            <StackCard tech="Bull / BullMQ (Job Queue)" description="Queue for: route pre-computation, notifications, trip receipt processing, and fare calculation. Decouples latency-sensitive APIs from background work. Retries on Google API failures." />
+            <StackCard tech="Google Maps Platform (via backend only)" description={<>Called exclusively from the Route Service. <code className="font-mono text-xs text-primary">RouteCache</code> module: key = SHA256(origin+destination), TTL = 24h. Use Maps Routes API v2 (cheaper than legacy Directions API).</>} />
           </div>
 
           <CodeBlock className="mt-6">
@@ -812,7 +852,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </CodeBlock>
         </section>
 
-        {/* ── Section 8: Migration Plan ── */}
+        {/* ── Section 8 ── */}
         <section id="s8" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">08</span>
@@ -913,11 +953,27 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
 
         <hr className="border-0 border-t border-border my-14" />
 
-        {/* End note */}
-        <div className="text-center pb-4">
+        {/* End note (screen) */}
+        <div className="text-center pb-4 print:hidden">
           <p className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground/40">
             End of Report — Optin Digital Solutions Ltd — April 2026
           </p>
+        </div>
+
+        {/* Print-only end note */}
+        <div className="hidden print:block text-center pb-4">
+          <p className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground/40">
+            End of Report — Optin Digital Solutions Ltd — April 2026
+          </p>
+          <div className="mt-6 flex items-center justify-center">
+            <Image
+              src="/images/optin-logo.webp"
+              alt="Optin Technology Limited"
+              width={100}
+              height={32}
+              className="h-8 w-auto opacity-50"
+            />
+          </div>
         </div>
       </div>
     </div>
