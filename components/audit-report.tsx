@@ -153,11 +153,10 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
             key={s.id}
             href={`#${s.id}`}
             onClick={() => onSelect?.()}
-            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all ${
-              active
-                ? "bg-amber-400/15 text-amber-300 font-medium"
-                : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
-            }`}
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all ${active
+              ? "bg-amber-400/15 text-amber-300 font-medium"
+              : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5"
+              }`}
           >
             <span className={`font-mono text-[9px] tracking-widest flex-shrink-0 ${active ? "text-amber-400" : "text-zinc-600"}`}>
               {s.num}
@@ -516,62 +515,62 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
               <svg width="100%" viewBox="0 0 800 480" xmlns="http://www.w3.org/2000/svg" style={{ minWidth: 500 }}>
                 <defs>
                   <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M2 1L8 5L2 9" fill="none" stroke="#c9a227" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 1L8 5L2 9" fill="none" stroke="#c9a227" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </marker>
                   <marker id="arb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M2 1L8 5L2 9" fill="none" stroke="#2977c0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 1L8 5L2 9" fill="none" stroke="#2977c0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </marker>
                   <marker id="arp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                    <path d="M2 1L8 5L2 9" fill="none" stroke="#7864c0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 1L8 5L2 9" fill="none" stroke="#7864c0" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </marker>
                 </defs>
                 {[["MOBILE CLIENTS", 20, 60], ["API GATEWAY", 20, 188], ["BACKEND SERVICES", 20, 318], ["EXTERNAL APIs", 20, 448]].map(([t, x, y]) => (
                   <text key={String(t)} fontFamily="'DM Mono',monospace" fontSize="9" letterSpacing="2" x={Number(x)} y={Number(y)} fill="#3d5c3a">{t}</text>
                 ))}
-                <rect x="140" y="30" width="150" height="52" rx="8" fill="rgba(201,162,39,0.07)" stroke="rgba(201,162,39,0.3)" strokeWidth="1"/>
+                <rect x="140" y="30" width="150" height="52" rx="8" fill="rgba(201,162,39,0.07)" stroke="rgba(201,162,39,0.3)" strokeWidth="1" />
                 <text fontFamily="'Instrument Sans',sans-serif" fontSize="12" fontWeight="600" fill="rgba(244,240,232,0.75)" x="215" y="52" textAnchor="middle">Customer App</text>
                 <text fontFamily="'DM Mono',monospace" fontSize="9" fill="rgba(201,162,39,0.5)" x="215" y="70" textAnchor="middle">Flutter · GetX</text>
-                <rect x="310" y="30" width="150" height="52" rx="8" fill="rgba(201,162,39,0.07)" stroke="rgba(201,162,39,0.3)" strokeWidth="1"/>
+                <rect x="310" y="30" width="150" height="52" rx="8" fill="rgba(201,162,39,0.07)" stroke="rgba(201,162,39,0.3)" strokeWidth="1" />
                 <text fontFamily="'Instrument Sans',sans-serif" fontSize="12" fontWeight="600" fill="rgba(244,240,232,0.75)" x="385" y="52" textAnchor="middle">Driver App</text>
                 <text fontFamily="'DM Mono',monospace" fontSize="9" fill="rgba(201,162,39,0.5)" x="385" y="70" textAnchor="middle">Flutter · GetX</text>
-                <line x1="215" y1="82" x2="265" y2="158" stroke="rgba(201,162,39,0.4)" strokeWidth="1" markerEnd="url(#arr)"/>
-                <line x1="385" y1="82" x2="325" y2="158" stroke="rgba(201,162,39,0.4)" strokeWidth="1" markerEnd="url(#arr)"/>
-                <rect x="160" y="158" width="265" height="52" rx="8" fill="rgba(42,157,92,0.07)" stroke="rgba(42,157,92,0.3)" strokeWidth="1.5"/>
+                <line x1="215" y1="82" x2="265" y2="158" stroke="rgba(201,162,39,0.4)" strokeWidth="1" markerEnd="url(#arr)" />
+                <line x1="385" y1="82" x2="325" y2="158" stroke="rgba(201,162,39,0.4)" strokeWidth="1" markerEnd="url(#arr)" />
+                <rect x="160" y="158" width="265" height="52" rx="8" fill="rgba(42,157,92,0.07)" stroke="rgba(42,157,92,0.3)" strokeWidth="1.5" />
                 <text fontFamily="'Instrument Sans',sans-serif" fontSize="12" fontWeight="600" fill="rgba(244,240,232,0.8)" x="292" y="179" textAnchor="middle">API Gateway / NestJS</text>
                 <text fontFamily="'DM Mono',monospace" fontSize="9" fill="rgba(42,157,92,0.5)" x="292" y="197" textAnchor="middle">Auth · Rate Limiting · REST + WebSocket</text>
-                <line x1="240" y1="210" x2="195" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)"/>
-                <line x1="292" y1="210" x2="355" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)"/>
-                <line x1="344" y1="210" x2="520" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)"/>
+                <line x1="240" y1="210" x2="195" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)" />
+                <line x1="292" y1="210" x2="355" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)" />
+                <line x1="344" y1="210" x2="520" y2="278" stroke="rgba(41,119,192,0.4)" strokeWidth="0.8" strokeDasharray="4 3" markerEnd="url(#arb)" />
                 {[
                   [130, 278, "Route Service", "Polyline · ETA cache", 195],
                   [300, 278, "Dispatch Service", "Driver matching · Geo", 365],
                   [470, 278, "Location Service", "WebSocket · broadcast", 535],
                 ].map(([x, y, title, sub, tx]) => (
                   <g key={String(title)}>
-                    <rect x={Number(x)} y={Number(y)} width="145" height="52" rx="7" fill="rgba(41,119,192,0.07)" stroke="rgba(41,119,192,0.25)" strokeWidth="1"/>
+                    <rect x={Number(x)} y={Number(y)} width="145" height="52" rx="7" fill="rgba(41,119,192,0.07)" stroke="rgba(41,119,192,0.25)" strokeWidth="1" />
                     <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.7)" x={Number(tx)} y={Number(y) + 22} textAnchor="middle">{title}</text>
                     <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(41,119,192,0.5)" x={Number(tx)} y={Number(y) + 38} textAnchor="middle">{sub}</text>
                   </g>
                 ))}
-                <rect x="640" y="278" width="130" height="52" rx="7" fill="rgba(217,79,43,0.07)" stroke="rgba(217,79,43,0.25)" strokeWidth="1"/>
+                <rect x="640" y="278" width="130" height="52" rx="7" fill="rgba(217,79,43,0.07)" stroke="rgba(217,79,43,0.25)" strokeWidth="1" />
                 <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.7)" x="705" y="300" textAnchor="middle">Redis Cache</text>
                 <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(217,79,43,0.5)" x="705" y="316" textAnchor="middle">Routes · Places · ETAs</text>
-                <line x1="280" y1="304" x2="638" y2="304" stroke="rgba(217,79,43,0.25)" strokeWidth="0.8" strokeDasharray="4 3"/>
-                <line x1="195" y1="330" x2="195" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)"/>
-                <line x1="365" y1="330" x2="365" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)"/>
-                <line x1="535" y1="330" x2="535" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)"/>
+                <line x1="280" y1="304" x2="638" y2="304" stroke="rgba(217,79,43,0.25)" strokeWidth="0.8" strokeDasharray="4 3" />
+                <line x1="195" y1="330" x2="195" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)" />
+                <line x1="365" y1="330" x2="365" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)" />
+                <line x1="535" y1="330" x2="535" y2="398" stroke="rgba(120,90,200,0.35)" strokeWidth="0.8" markerEnd="url(#arp)" />
                 {[
                   [120, 398, "Directions API", "Backend calls only", 195],
                   [290, 398, "Places API", "Cached in Redis", 362],
                   [460, 398, "Distance Matrix", "Batch requests only", 533],
                 ].map(([x, y, title, sub, tx]) => (
                   <g key={String(title)}>
-                    <rect x={Number(x)} y={Number(y)} width="147" height="52" rx="7" fill="rgba(120,90,200,0.06)" stroke="rgba(120,90,200,0.2)" strokeWidth="1"/>
+                    <rect x={Number(x)} y={Number(y)} width="147" height="52" rx="7" fill="rgba(120,90,200,0.06)" stroke="rgba(120,90,200,0.2)" strokeWidth="1" />
                     <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.6)" x={Number(tx)} y={Number(y) + 22} textAnchor="middle">{title}</text>
                     <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(120,90,200,0.5)" x={Number(tx)} y={Number(y) + 38} textAnchor="middle">{sub}</text>
                   </g>
                 ))}
-                <rect x="648" y="110" width="132" height="36" rx="6" fill="none" stroke="rgba(217,79,43,0.3)" strokeWidth="1" strokeDasharray="3 3"/>
+                <rect x="648" y="110" width="132" height="36" rx="6" fill="none" stroke="rgba(217,79,43,0.3)" strokeWidth="1" strokeDasharray="3 3" />
                 <text fontFamily="'DM Mono',monospace" fontSize="9" fill="rgba(217,79,43,0.8)" x="714" y="126" textAnchor="middle">Mobile apps NEVER</text>
                 <text fontFamily="'DM Mono',monospace" fontSize="9" fill="rgba(217,79,43,0.8)" x="714" y="140" textAnchor="middle">call Google APIs directly</text>
               </svg>
