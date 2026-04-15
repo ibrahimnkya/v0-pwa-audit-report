@@ -77,15 +77,8 @@ function ReportSidebar({
       <SidebarHeader className="h-16 border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-4 h-full">
           {/* Logo mark — always visible */}
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 overflow-hidden">
-            <OptinLogo className="h-7 w-auto" />
-          </div>
-          {/* Wordmark — hidden when collapsed */}
-          <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden min-w-0">
-            <span className="font-mono text-[11px] font-semibold tracking-wide text-foreground truncate">
-              Optin<span className="text-muted-foreground font-normal">.co.tz</span>
-            </span>
-            <span className="text-[10px] text-muted-foreground truncate">Technical Audit</span>
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden">
+            <OptinLogo className="h-16 w-auto" />
           </div>
         </div>
       </SidebarHeader>
@@ -302,16 +295,9 @@ export default function Home() {
 
             <div className="hidden sm:flex items-center gap-2.5 min-w-0">
               {/* Logo */}
-              <div className="h-7 w-7 rounded-md overflow-hidden shrink-0">
-                <OptinLogo className="h-7 w-auto" />
+              <div className="h-18 w-18 rounded-md overflow-hidden shrink-0">
+                <OptinLogo className="h-18 w-auto" />
               </div>
-              <span className="font-mono text-xs tracking-wide text-muted-foreground truncate">
-                <strong className="text-primary font-semibold">Optin</strong>.co.tz
-              </span>
-              <div className="h-3 w-px bg-border shrink-0" />
-              <span className="hidden md:block font-mono text-[10px] tracking-wider uppercase text-muted-foreground/50 truncate">
-                Technical Audit — Jamboride — April 2026
-              </span>
             </div>
           </div>
 
