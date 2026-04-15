@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import {
   Accordion,
   AccordionContent,
@@ -13,11 +12,8 @@ import {
 import {
   CheckCircle2,
   AlertTriangle,
-  Download,
-  Lock,
   ExternalLink,
   Check,
-  LogOut,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -167,10 +163,7 @@ function StackCard({ tech, description }: { tech: string; description: React.Rea
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
-  const [activeSection, setActiveSection] = useState("s1")
-
   const scrollToSection = (sectionId: string) => {
-    setActiveSection(sectionId)
     const element = document.getElementById(sectionId)
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -179,28 +172,6 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
 
   return (
     <div className="w-full">
-      {/* Print / Access Strip */}
-      <div className="bg-primary/5 border-b border-primary/20 px-8 py-2.5 flex items-center justify-between text-[10px] font-mono tracking-wider uppercase text-primary/60">
-        <span>Prepared by Optin Digital Solutions Ltd — optin.co.tz</span>
-        <div className="flex items-center gap-4">
-          <span className="text-primary">Client: Jamboride — April 2026</span>
-          {userEmail && (
-            <span className="text-muted-foreground hidden sm:inline">
-              Viewing as: {userEmail}
-            </span>
-          )}
-          {onLogout && (
-            <button
-              onClick={onLogout}
-              className="flex items-center gap-1 text-muted-foreground hover:text-destructive transition-colors"
-            >
-              <LogOut className="h-3 w-3" />
-              Sign out
-            </button>
-          )}
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative py-20 px-10 max-w-[900px] mx-auto">
         <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-widest uppercase text-primary mb-6">
@@ -283,7 +254,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </Card>
 
         {/* ── Section 1: Root Cause Analysis ── */}
-        <section id="s1" className="mb-16">
+        <section id="s1" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">01</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -498,7 +469,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 2: Code & Architecture Weaknesses ── */}
-        <section id="s2" className="mb-16">
+        <section id="s2" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">02</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -572,7 +543,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 3: Steps Taken ── */}
-        <section id="s3" className="mb-16">
+        <section id="s3" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">03</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -627,7 +598,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 4: Architecture Proposal ── */}
-        <section id="s4" className="mb-16">
+        <section id="s4" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">04</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -679,7 +650,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 5: Firebase Evaluation ── */}
-        <section id="s5" className="mb-16">
+        <section id="s5" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">05</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -732,7 +703,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 6: Cost Reduction ── */}
-        <section id="s6" className="mb-16">
+        <section id="s6" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">06</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -786,7 +757,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 7: Backend Stack ── */}
-        <section id="s7" className="mb-16">
+        <section id="s7" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">07</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -842,7 +813,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* ── Section 8: Migration Plan ── */}
-        <section id="s8" className="mb-16">
+        <section id="s8" className="mb-16 scroll-mt-32">
           <div className="flex items-center gap-4 mb-7 pb-4 border-b border-border">
             <span className="font-mono text-[10px] text-primary tracking-wider">08</span>
             <h2 className="font-serif text-xl sm:text-[22px] font-bold tracking-tight text-foreground">
@@ -940,46 +911,15 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           </div>
         </section>
 
-        {/* Divider */}
         <hr className="border-0 border-t border-border my-14" />
 
-        {/* Footer */}
-        <footer className="border-t bg-background py-6 print:hidden">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
-            <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Optin Digital Solutions Ltd. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </a>
-              <a
-                href="https://optin.co.tz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-              >
-                Contact <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-        </footer>
+        {/* End note */}
+        <div className="text-center pb-4">
+          <p className="font-mono text-[10px] tracking-widest uppercase text-muted-foreground/40">
+            End of Report — Optin Digital Solutions Ltd — April 2026
+          </p>
+        </div>
       </div>
-
-      {/* Actions */}
-      {/* <div className="flex flex-col sm:flex-row gap-4 justify-center pb-12 px-4">
-        <Button className="gap-2 font-semibold">
-          <Download className="h-4 w-4" />
-          Download PDF Report
-        </Button>
-        <Button variant="outline" className="gap-2">
-          <ExternalLink className="h-4 w-4" />
-          Share Report Link
-        </Button>
-      </div> */}
     </div>
   )
 }
