@@ -77,8 +77,8 @@ function ReportSidebar({
       <SidebarHeader className="h-16 border-b border-sidebar-border">
         <div className="flex items-center gap-3 px-4 h-full">
           {/* Logo mark — always visible */}
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden">
-            <OptinLogo className="h-16 w-auto" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden">
+            <OptinLogo className="h-12 w-auto" />
           </div>
         </div>
       </SidebarHeader>
@@ -295,8 +295,8 @@ export default function Home() {
 
             <div className="hidden sm:flex items-center gap-2.5 min-w-0">
               {/* Logo */}
-              <div className="h-18 w-18 rounded-md overflow-hidden shrink-0">
-                <OptinLogo className="h-18 w-auto" />
+              <div className="h-12 w-12 rounded-md overflow-hidden shrink-0">
+                <OptinLogo className="h-12 w-auto" />
               </div>
             </div>
           </div>
