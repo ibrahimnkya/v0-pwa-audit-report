@@ -56,7 +56,7 @@ function CodeBlock({
 
   return (
     <div className={cn("relative group rounded-xl overflow-hidden border border-border/60 my-4", className)}>
-      <div className="flex items-center justify-between px-4 py-2 bg-muted/40 border-b border-border/60">
+      <div className="flex items-center justify-between px-4 py-2 bg-black/40 border-b border-border/60">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-destructive/40" />
           <span className="w-2.5 h-2.5 rounded-full bg-yellow-500/40" />
@@ -73,7 +73,7 @@ function CodeBlock({
           )}
         </button>
       </div>
-      <pre className="bg-[hsl(var(--muted)/0.3)] px-5 py-4 overflow-x-auto font-mono text-[12.5px] leading-relaxed text-muted-foreground">
+      <pre className="bg-[hsl(var(--black)/0.3)] px-5 py-4 overflow-x-auto font-mono text-[12.5px] leading-relaxed text-muted-foreground">
         <code>{children}</code>
       </pre>
     </div>
