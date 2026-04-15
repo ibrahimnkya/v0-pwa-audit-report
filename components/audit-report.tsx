@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import {
   Accordion,
   AccordionContent,
@@ -58,7 +56,6 @@ function CodeBlock({
 
   return (
     <div className={cn("relative group rounded-xl overflow-hidden border border-border/60 my-4", className)}>
-      {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-muted/40 border-b border-border/60">
         <div className="flex items-center gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-destructive/40" />
@@ -76,7 +73,6 @@ function CodeBlock({
           )}
         </button>
       </div>
-      {/* Code */}
       <pre className="bg-[hsl(var(--muted)/0.3)] px-5 py-4 overflow-x-auto font-mono text-[12.5px] leading-relaxed text-muted-foreground">
         <code>{children}</code>
       </pre>
@@ -348,49 +344,13 @@ export function AuditReport({ userEmail }: AuditReportProps) {
         </div>
       </div>
 
-      {/* ── Hero ── */}
-      <section className="relative px-8 lg:px-12 pt-12 pb-10 max-w-[860px] mx-auto">
-        <div className="flex items-center gap-2 font-mono text-[10px] tracking-widest uppercase text-primary/70 mb-5">
-          Technical Audit Report
-          <div className="h-px w-16 bg-primary/20" />
-          April 2026
-        </div>
-
-        <h1 className="text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-[1.08] mb-3">
-          Jamboride<br />
-          Architecture &amp; <span className="text-primary italic">Cost</span><br />
-          Optimization Audit
-        </h1>
-
-        <p className="text-[14px] text-muted-foreground font-mono tracking-wide mb-10">
-          Flutter · Firebase · Google Maps / Directions APIs
-        </p>
-
-        {/* Meta grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 rounded-2xl border border-border/60 overflow-hidden">
-          {[
-            { label: "Scope", value: "Customer App & Driver App (Flutter)" },
-            { label: "Backend", value: "Firebase (Firestore + Auth + Storage)" },
-            { label: "Maps Stack", value: "Google Maps, Directions, Distance Matrix" },
-            { label: "Audited By", value: "Optin Digital Solutions Ltd" },
-          ].map((item, i) => (
-            <div key={i} className="p-5 border-r border-b lg:border-b-0 border-border/60 last:border-r-0 bg-card/30">
-              <label className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/40 block mb-1.5">
-                {item.label}
-              </label>
-              <span className="text-[13px] text-foreground font-medium leading-snug">{item.value}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── Stat strip ── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 bg-primary">
+      {/* ── Stat strip — full bleed ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 bg-primary print:hidden">
         {[
-          { num: "8", label: "Critical Issues Found" },
+          { num: "8",    label: "Critical Issues Found" },
           { num: "~65%", label: "Estimated API Cost Reduction" },
-          { num: "5", label: "Google API Endpoints Audited" },
-          { num: "3", label: "Migration Phases Planned" },
+          { num: "5",    label: "Google API Endpoints Audited" },
+          { num: "3",    label: "Migration Phases Planned" },
         ].map((stat, i) => (
           <div key={i} className="p-5 lg:p-6 border-r border-primary-foreground/10 last:border-r-0 text-primary-foreground">
             <div className="text-3xl lg:text-4xl font-bold tracking-tight leading-none">{stat.num}</div>
@@ -400,7 +360,7 @@ export function AuditReport({ userEmail }: AuditReportProps) {
       </div>
 
       {/* ── Body ── */}
-      <div className="max-w-[860px] mx-auto px-8 lg:px-12 py-14 space-y-20">
+      <div className="w-full max-w-[1100px] mx-auto px-6 lg:px-10 xl:px-14 py-12 space-y-20">
 
         {/* TOC */}
         <div className="rounded-2xl border border-border/60 p-6 bg-card/30">
@@ -759,7 +719,7 @@ location.enableBackgroundMode(enable: true);
         <section id="s7" className="scroll-mt-24">
           <SectionHeader number="07" title="Recommended Backend Stack" badge="Phase 2–3" badgeVariant="next" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 mb-6">
             <StackCard
               tech="NestJS (Node.js)"
               description="TypeScript-first, modular architecture with dependency injection. Ideal for domain-driven ride-hailing services (RideModule, DriverModule, RouteModule). Built-in WebSocket gateway via Socket.io adapter."
