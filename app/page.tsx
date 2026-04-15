@@ -26,15 +26,23 @@ import Image from "next/image"
 type AppState = "consent" | "report"
 
 const sections = [
-  { id: "s1", number: "01", title: "Root Cause Analysis", icon: AlertTriangle, badge: "8 Issues" },
-  { id: "s2", number: "02", title: "Architecture Weaknesses", icon: Layers, badge: "Systemic" },
-  { id: "s3", number: "03", title: "Steps Taken (Phase 1)", icon: CheckCircle2, badge: "Done" },
-  { id: "s4", number: "04", title: "Architecture Proposal", icon: GitBranch, badge: "Phase 2–3" },
-  { id: "s5", number: "05", title: "Firebase Evaluation", icon: Database, badge: "Hybrid" },
-  { id: "s6", number: "06", title: "Cost Reduction", icon: TrendingDown, badge: "Projected" },
-  { id: "s7", number: "07", title: "Backend Stack", icon: Server, badge: "Phase 2–3" },
-  { id: "s8", number: "08", title: "Migration Plan", icon: FileText, badge: "Active" },
+  { id: "s1", number: "01", title: "Root Cause Analysis",    icon: AlertTriangle,  badge: "8 Issues"  },
+  { id: "s2", number: "02", title: "Architecture Weaknesses", icon: Layers,         badge: "Systemic"  },
+  { id: "s3", number: "03", title: "Steps Taken (Phase 1)",   icon: CheckCircle2,   badge: "Done"      },
+  { id: "s4", number: "04", title: "Architecture Proposal",   icon: GitBranch,      badge: "Phase 2–3" },
+  { id: "s5", number: "05", title: "Firebase Evaluation",     icon: Database,       badge: "Hybrid"    },
+  { id: "s6", number: "06", title: "Cost Reduction",          icon: TrendingDown,   badge: "Projected" },
+  { id: "s7", number: "07", title: "Backend Stack",           icon: Server,         badge: "Phase 2–3" },
+  { id: "s8", number: "08", title: "Migration Plan",          icon: FileText,       badge: "Active"    },
 ]
+
+/** Derive up to 2 uppercase initials from an email address */
+function getInitials(email: string): string {
+  const local = email.split("@")[0]
+  const parts = local.split(/[._\-+]/).filter(Boolean)
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase()
+  return local.slice(0, 2).toUpperCase()
+}
 
 function OptinLogo({ className }: { className?: string }) {
   return (
@@ -49,7 +57,7 @@ function OptinLogo({ className }: { className?: string }) {
   )
 }
 
-// ── Sidebar — always open, no collapsible ──────────────────────────────────
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 function ReportSidebar({
   activeSection,
   onSectionClick,
@@ -112,7 +120,7 @@ function ReportSidebar({
   )
 }
 
-// ── Page ─────────────────────────────────────────────────────────────────────
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function Home() {
   const [state, setState] = useState<AppState>("consent")
   const [email, setEmail] = useState("")
@@ -228,23 +236,37 @@ export default function Home() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Sidebar — always visible, never collapses */}
+      {/* Sidebar */}
       <ReportSidebar activeSection={activeSection} onSectionClick={handleSectionClick} />
 
       {/* Main content area */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
 
-        {/* Top bar */}
+        {/* ── Top bar ── */}
         <header className="sticky top-0 z-50 flex h-16 items-center justify-between gap-4 border-b bg-background/95 backdrop-blur-xl px-4 lg:px-6 shrink-0 print:hidden">
-          {/* Left */}
+
+          {/* Left — logo (mobile) + report title */}
           <div className="flex items-center gap-3 min-w-0">
-            {/* Logo visible on mobile (sidebar hidden on mobile) */}
+            {/* Logo on mobile only (sidebar hides it on desktop) */}
             <div className="flex lg:hidden items-center shrink-0">
               <OptinLogo className="h-7 w-auto object-contain" />
             </div>
+
+            {/* Divider */}
+            <span className="hidden lg:block w-px h-5 bg-border shrink-0" />
+
+            {/* Report title block */}
+            <div className="hidden sm:flex flex-col justify-center min-w-0">
+              <span className="font-mono text-[9px] tracking-widest uppercase text-muted-foreground/40 leading-none mb-0.5">
+                Technical Audit · April 2026
+              </span>
+              <span className="text-[13px] font-semibold text-foreground tracking-tight leading-none truncate">
+                Jamboride — Architecture &amp; Cost Optimization
+              </span>
+            </div>
           </div>
 
-          {/* Right */}
+          {/* Right — actions */}
           <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
@@ -285,18 +307,54 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Access strip */}
-        <div className="bg-primary/5 border-b border-primary/20 px-6 py-2 flex items-center justify-between text-[10px] font-mono tracking-wider uppercase text-primary/60 shrink-0 print:hidden">
-          <span>Prepared by Optin Digital Solutions Ltd — optin.co.tz</span>
-          <div className="flex items-center gap-4">
-            <span className="text-primary">Client: Jamboride — April 2026</span>
+        {/* ── Access strip ── */}
+        <div className="bg-primary/5 border-b border-primary/20 px-4 lg:px-6 h-[34px] flex items-center justify-between shrink-0 print:hidden">
+
+          {/* Left: prepared by */}
+          <div className="flex items-center gap-1.5 font-mono text-[10px] tracking-wider uppercase text-muted-foreground/60 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary/40 shrink-0" />
+            <span className="truncate hidden sm:inline">Prepared by Optin Digital Solutions Ltd</span>
+            <span className="truncate sm:hidden">Optin Digital Solutions</span>
+            <span className="opacity-30 shrink-0">·</span>
+            <a
+              href="https://optin.co.tz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary/70 hover:text-primary transition-colors shrink-0"
+            >
+              optin.co.tz
+            </a>
+          </div>
+
+          {/* Right: client + date + viewer */}
+          <div className="flex items-center gap-2.5 font-mono text-[10px] tracking-wider uppercase shrink-0">
+
+            {/* Client pill */}
+            <span className="flex items-center gap-1 bg-primary/10 text-primary border border-primary/20 rounded-full px-2 py-0.5 leading-none">
+              <span className="w-1 h-1 rounded-full bg-primary/60 shrink-0" />
+              Jamboride
+            </span>
+
+            {/* Date */}
+            <span className="text-muted-foreground/40 hidden md:inline">April 2026</span>
+
+            {/* Divider */}
+            <span className="w-px h-3.5 bg-border hidden sm:block" />
+
+            {/* Viewer */}
             {email && (
-              <span className="text-muted-foreground hidden sm:inline">Viewing as: {email}</span>
+              <div className="hidden sm:flex items-center gap-1.5 text-muted-foreground/60">
+                <span className="w-4 h-4 rounded-full bg-primary/10 border border-primary/20 text-primary flex items-center justify-center font-mono text-[8px] font-medium shrink-0 leading-none">
+                  {getInitials(email)}
+                </span>
+                <span className="opacity-50 hidden md:inline">Viewing as</span>
+                <span className="text-foreground/60 font-medium">{email}</span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Scrollable report content */}
+        {/* ── Scrollable report content ── */}
         <main ref={mainRef} className="flex-1 overflow-y-auto bg-background">
           <AuditReport userEmail={email} onLogout={handleLogout} />
 
@@ -306,8 +364,12 @@ export default function Home() {
                 &copy; {new Date().getFullYear()} Optin Digital Solutions Ltd. All rights reserved.
               </p>
               <div className="flex items-center gap-6">
-                <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">Privacy Policy</a>
-                <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">Terms of Service</a>
+                <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                  Privacy Policy
+                </a>
+                <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
+                  Terms of Service
+                </a>
                 <a
                   href="https://optin.co.tz"
                   target="_blank"
