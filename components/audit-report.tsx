@@ -941,36 +941,13 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
         </section>
 
         {/* Divider */}
-        <hr className="border-0 border-t border-border my-14" />
 
         {/* Footer */}
-        <footer className="border-t bg-background py-6 print:hidden">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6">
-            <p className="text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Optin Digital Solutions Ltd. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-xs text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </a>
-              <a
-                href="https://optin.co.tz"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-              >
-                Contact <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-        </footer>
+        
       </div>
 
       {/* Actions */}
-      {/* <div className="flex flex-col sm:flex-row gap-4 justify-center pb-12 px-4">
+<div className="flex flex-col sm:flex-row gap-4 justify-center pb-12 px-4">
         <Button className="gap-2 font-semibold">
           <Download className="h-4 w-4" />
           Download PDF Report
@@ -979,7 +956,7 @@ export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
           <ExternalLink className="h-4 w-4" />
           Share Report Link
         </Button>
-      </div> */}
+      </div> 
     </div>
   )
 }
