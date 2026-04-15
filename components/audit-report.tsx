@@ -1,9 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -29,7 +27,7 @@ const sections = [
 
 // ─── Code Block ─────────────────────────────────────────────────────────────
 
-function CodeBlock({ code, lang = "dart" }) {
+function CodeBlock({ code, lang = "dart" }: { code: string; lang?: string }) {
   const [copied, setCopied] = useState(false)
   const copy = () => {
     navigator.clipboard.writeText(code)
@@ -56,7 +54,7 @@ function CodeBlock({ code, lang = "dart" }) {
 
 // ─── Callout ────────────────────────────────────────────────────────────────
 
-function Callout({ variant = "gold", children }) {
+function Callout({ variant = "gold", children }: { variant?: "gold" | "danger" | "success"; children: React.ReactNode }) {
   const styles = {
     gold: "border-amber-500/40 bg-amber-500/5 text-zinc-300",
     danger: "border-red-500/40 bg-red-500/5 text-zinc-300",
@@ -71,7 +69,7 @@ function Callout({ variant = "gold", children }) {
 
 // ─── Issue Card ──────────────────────────────────────────────────────────────
 
-function IssueCard({ title, children }) {
+function IssueCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-white/8 bg-white/[0.025] p-4 space-y-2 my-3">
       <h4 className="text-sm font-semibold text-amber-300">{title}</h4>
@@ -82,7 +80,7 @@ function IssueCard({ title, children }) {
 
 // ─── Step Done ───────────────────────────────────────────────────────────────
 
-function StepDone({ title, children }) {
+function StepDone({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="flex gap-4 py-4 border-b border-white/8 last:border-0">
       <div className="mt-0.5 flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center">
@@ -98,8 +96,8 @@ function StepDone({ title, children }) {
 
 // ─── Section Header ──────────────────────────────────────────────────────────
 
-function SectionHeader({ num, title, badge, badgeVariant }) {
-  const badgeStyles = {
+function SectionHeader({ num, title, badge, badgeVariant }: { num: string; title: string; badge: string; badgeVariant: string }) {
+  const badgeStyles: Record<string, string> = {
     destructive: "bg-red-500/15 text-red-400 border border-red-500/25",
     success: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25",
     warning: "bg-amber-500/15 text-amber-400 border border-amber-500/25",
@@ -117,10 +115,15 @@ function SectionHeader({ num, title, badge, badgeVariant }) {
 
 // ─── Main Component ──────────────────────────────────────────────────────────
 
-export default function JamborideAudit() {
+interface AuditReportProps {
+  userEmail?: string
+  onLogout?: () => void
+}
+
+export function AuditReport({ userEmail, onLogout }: AuditReportProps) {
   const [activeSection, setActiveSection] = useState("s1")
   const [mobileOpen, setMobileOpen] = useState(false)
-  const mainRef = useRef(null)
+  const mainRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -141,7 +144,7 @@ export default function JamborideAudit() {
 
   const progress = ((sections.findIndex((s) => s.id === activeSection) + 1) / sections.length) * 100
 
-  const NavLinks = ({ onSelect }) => (
+  const NavLinks = ({ onSelect }: { onSelect?: () => void }) => (
     <div className="space-y-0.5">
       {sections.map((s) => {
         const active = activeSection === s.id
@@ -237,6 +240,14 @@ export default function JamborideAudit() {
             <span className="hidden sm:block text-zinc-700 text-xs font-mono tracking-wider">/ Jamboride Audit · April 2026</span>
           </div>
           <div className="flex items-center gap-2">
+            {userEmail && onLogout && (
+              <button
+                onClick={onLogout}
+                className="font-mono text-[10px] tracking-widest uppercase text-zinc-500 hover:text-zinc-200 transition-colors mr-2"
+              >
+                Sign Out
+              </button>
+            )}
             <span className="font-mono text-[10px] tracking-widest uppercase text-red-400 border border-red-500/30 rounded-full px-2.5 py-1 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
               Confidential
@@ -344,7 +355,7 @@ export default function JamborideAudit() {
   });`} />
               <p className="text-xs text-zinc-500 mt-2">
                 With <code>distanceFilter: 1</code>, a 10-minute ride at 50 km/h produces ~833 snapshot events. Both apps call Directions API on each:{" "}
-                <strong className="text-zinc-300">~1,666 Directions API calls per trip.</strong> At $0.005/call, that's $8.33 per ride in Directions costs alone.
+                <strong className="text-zinc-300">~1,666 Directions API calls per trip.</strong> At $0.005/call, that&apos;s $8.33 per ride in Directions costs alone.
               </p>
             </IssueCard>
 
@@ -374,7 +385,7 @@ export default function JamborideAudit() {
             </IssueCard>
 
             <IssueCard title="Issue 6 — Places Autocomplete + Distance Matrix on Every Keystroke">
-              <p>The customer's destination search calls both the Places Autocomplete API and Distance Matrix API on every character typed, with no debounce. Typing "Dar es Salaam Airport" (19 chars) fires 19 Autocomplete + 19 Distance Matrix calls.</p>
+              <p>The customer&apos;s destination search calls both the Places Autocomplete API and Distance Matrix API on every character typed, with no debounce. Typing &quot;Dar es Salaam Airport&quot; (19 chars) fires 19 Autocomplete + 19 Distance Matrix calls.</p>
             </IssueCard>
 
             <IssueCard title="Issue 7 — Nearby Places API Called on Every App Open">
@@ -404,7 +415,7 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                 {
                   pill: "Memory Leak",
                   title: "Unmanaged StreamSubscriptions leading to zombie listeners",
-                  body: <>Inner <code>StreamSubscription</code> objects created inside outer listener callbacks are never stored in a variable. They cannot be <code>cancel()</code>-ed in <code>onClose()</code>, creating permanent memory leaks and duplicate API calls that compound over a trip's duration.</>,
+                  body: <>Inner <code>StreamSubscription</code> objects created inside outer listener callbacks are never stored in a variable. They cannot be <code>cancel()</code>-ed in <code>onClose()</code>, creating permanent memory leaks and duplicate API calls that compound over a trip&apos;s duration.</>,
                   pillColor: "bg-red-500/15 text-red-400",
                 },
                 {
@@ -478,10 +489,10 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                 The <code>getPolyline()</code> call inside the <code>monitorTrip</code> driver listener was replaced with a pure client-side <code>trimPolyline()</code> function. The Directions API is now called only when the driver deviates more than 80m from the polyline corridor. Estimated reduction: <strong className="text-zinc-200">70–85% of in-trip Directions API calls.</strong>
               </StepDone>
               <StepDone title="Added 300ms debounce and 3-character minimum to destination search">
-                A <code>Timer</code>-based debounce was added to the customer app's <code>onSearchChanged()</code> handler. Autocomplete calls now fire only after 300ms of typing inactivity and require at least 3 characters. Estimated reduction: <strong className="text-zinc-200">60–80% of Places Autocomplete calls.</strong>
+                A <code>Timer</code>-based debounce was added to the customer app&apos;s <code>onSearchChanged()</code> handler. Autocomplete calls now fire only after 300ms of typing inactivity and require at least 3 characters. Estimated reduction: <strong className="text-zinc-200">60–80% of Places Autocomplete calls.</strong>
               </StepDone>
               <StepDone title="Implemented nearby places result caching (10-minute TTL, 200m movement threshold)">
-                The <code>fetchNearbyPlacesWhere()</code> call on app open is now gated by a cache check. Results are reused for 10 minutes if the user's position has not moved more than 200m from the last fetch position.
+                The <code>fetchNearbyPlacesWhere()</code> call on app open is now gated by a cache check. Results are reused for 10 minutes if the user&apos;s position has not moved more than 200m from the last fetch position.
               </StepDone>
               <StepDone title={<>Re-enabled background location <code>distanceFilter: 20</code> in Driver app</>}>
                 The <code>location.changeSettings(distanceFilter: 20)</code> call that had been commented out was restored. Background location accuracy was also lowered to <code>LocationAccuracy.balanced</code> while backgrounded. Drivers waiting for rides no longer send continuous location updates to Firestore.
@@ -516,7 +527,7 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                 </defs>
                 {/* Labels */}
                 {[["MOBILE CLIENTS", 20, 60], ["API GATEWAY", 20, 188], ["BACKEND SERVICES", 20, 318], ["EXTERNAL APIs", 20, 448]].map(([t, x, y]) => (
-                  <text key={t} fontFamily="'DM Mono',monospace" fontSize="9" letterSpacing="2" x={x} y={y} fill="#3d5c3a">{t}</text>
+                  <text key={String(t)} fontFamily="'DM Mono',monospace" fontSize="9" letterSpacing="2" x={Number(x)} y={Number(y)} fill="#3d5c3a">{t}</text>
                 ))}
                 {/* Mobile clients */}
                 <rect x="140" y="30" width="150" height="52" rx="8" fill="rgba(201,162,39,0.07)" stroke="rgba(201,162,39,0.3)" strokeWidth="1"/>
@@ -542,10 +553,10 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                   [300, 278, "Dispatch Service", "Driver matching · Geo", 365],
                   [470, 278, "Location Service", "WebSocket · broadcast", 535],
                 ].map(([x, y, title, sub, tx]) => (
-                  <g key={title}>
-                    <rect x={x} y={y} width="145" height="52" rx="7" fill="rgba(41,119,192,0.07)" stroke="rgba(41,119,192,0.25)" strokeWidth="1"/>
-                    <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.7)" x={tx} y={y + 22} textAnchor="middle">{title}</text>
-                    <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(41,119,192,0.5)" x={tx} y={y + 38} textAnchor="middle">{sub}</text>
+                  <g key={String(title)}>
+                    <rect x={Number(x)} y={Number(y)} width="145" height="52" rx="7" fill="rgba(41,119,192,0.07)" stroke="rgba(41,119,192,0.25)" strokeWidth="1"/>
+                    <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.7)" x={Number(tx)} y={Number(y) + 22} textAnchor="middle">{title}</text>
+                    <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(41,119,192,0.5)" x={Number(tx)} y={Number(y) + 38} textAnchor="middle">{sub}</text>
                   </g>
                 ))}
                 {/* Redis */}
@@ -563,10 +574,10 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                   [290, 398, "Places API", "Cached in Redis", 362],
                   [460, 398, "Distance Matrix", "Batch requests only", 533],
                 ].map(([x, y, title, sub, tx]) => (
-                  <g key={title}>
-                    <rect x={x} y={y} width="147" height="52" rx="7" fill="rgba(120,90,200,0.06)" stroke="rgba(120,90,200,0.2)" strokeWidth="1"/>
-                    <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.6)" x={tx} y={y + 22} textAnchor="middle">{title}</text>
-                    <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(120,90,200,0.5)" x={tx} y={y + 38} textAnchor="middle">{sub}</text>
+                  <g key={String(title)}>
+                    <rect x={Number(x)} y={Number(y)} width="147" height="52" rx="7" fill="rgba(120,90,200,0.06)" stroke="rgba(120,90,200,0.2)" strokeWidth="1"/>
+                    <text fontFamily="'Instrument Sans',sans-serif" fontSize="11" fontWeight="600" fill="rgba(244,240,232,0.6)" x={Number(tx)} y={Number(y) + 22} textAnchor="middle">{title}</text>
+                    <text fontFamily="'DM Mono',monospace" fontSize="8" fill="rgba(120,90,200,0.5)" x={Number(tx)} y={Number(y) + 38} textAnchor="middle">{sub}</text>
                   </g>
                 ))}
                 {/* Notice */}
@@ -664,18 +675,18 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
                 </thead>
                 <tbody>
                   {[
-                    ["✓ Fix distanceFilter 1→8m + stop duplicate location stack", "Firestore writes, downstream Directions calls", "~40–50%", true, true],
-                    ["✓ Fix zombie listeners + store & cancel subscriptions", "Firestore reads, Directions API calls per trip", "~15–25%", true, true],
-                    ["✓ Polyline trimming instead of Directions recalculation", "Directions API calls during trip", "~70–85% of in-trip calls", true, true],
-                    ["✓ Debounce autocomplete + cache nearby places", "Places Autocomplete + Nearby Search calls", "~60–80%", true, true],
-                    ["Move route calculation to backend with Redis cache", "All Directions API calls (shared cache)", "~50–70% additional", false, false],
-                    ["Replace Firestore location tracking with WebSocket", "Firestore reads + writes (largest Firebase cost)", "~85–95%", false, false],
-                    ["Total (full implementation)", "Google Maps APIs + Firebase", "60–75% overall reduction", false, true],
+                    { action: "✓ Fix distanceFilter 1→8m + stop duplicate location stack", cost: "Firestore writes, downstream Directions calls", reduction: "~40–50%", done: true, highlight: false },
+                    { action: "✓ Fix zombie listeners + store & cancel subscriptions", cost: "Firestore reads, Directions API calls per trip", reduction: "~15–25%", done: true, highlight: false },
+                    { action: "✓ Polyline trimming instead of Directions recalculation", cost: "Directions API calls during trip", reduction: "~70–85% of in-trip calls", done: true, highlight: false },
+                    { action: "✓ Debounce autocomplete + cache nearby places", cost: "Places Autocomplete + Nearby Search calls", reduction: "~60–80%", done: true, highlight: false },
+                    { action: "Move route calculation to backend with Redis cache", cost: "All Directions API calls (shared cache)", reduction: "~50–70% additional", done: false, highlight: false },
+                    { action: "Replace Firestore location tracking with WebSocket", cost: "Firestore reads + writes (largest Firebase cost)", reduction: "~85–95%", done: false, highlight: false },
+                    { action: "Total (full implementation)", cost: "Google Maps APIs + Firebase", reduction: "60–75% overall reduction", done: false, highlight: true },
                   ].map((row, i) => (
-                    <tr key={i} className={`border-b border-white/8 last:border-0 transition-colors ${row[4] && i === 6 ? "bg-emerald-500/5 border-l-2 border-l-emerald-500" : "hover:bg-white/[0.02]"}`}>
-                      <td className={`px-4 py-3 ${row[2] === true ? "text-zinc-300 font-semibold" : "text-zinc-300"}`}>{row[0]}</td>
-                      <td className="px-4 py-3 text-zinc-400">{row[1]}</td>
-                      <td className={`px-4 py-3 font-mono text-xs font-semibold ${i === 6 ? "text-emerald-400" : row[3] ? "text-emerald-400" : "text-amber-400"}`}>{row[2]}</td>
+                    <tr key={i} className={`border-b border-white/8 last:border-0 transition-colors ${row.highlight ? "bg-emerald-500/5 border-l-2 border-l-emerald-500" : "hover:bg-white/[0.02]"}`}>
+                      <td className="px-4 py-3 text-zinc-300">{row.action}</td>
+                      <td className="px-4 py-3 text-zinc-400">{row.cost}</td>
+                      <td className={`px-4 py-3 font-mono text-xs font-semibold ${row.highlight ? "text-emerald-400" : row.done ? "text-emerald-400" : "text-amber-400"}`}>{row.reduction}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -817,5 +828,3 @@ location.<span class="fn">enableBackgroundMode</span>(enable: <span class="kw">t
     </div>
   )
 }
-
-export default AuditReport
